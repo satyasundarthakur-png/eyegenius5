@@ -3,6 +3,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { EYEBALL_RADIUS, COLORS } from '../../constants';
 import { useSimulationStore } from '../../stores/simulationStore';
+import { microscope } from '../../../../packages/microscope-engine/src/Microscope';
 
 /**
  * Seeded PRNG for deterministic iris texture.
@@ -197,21 +198,27 @@ export function Iris() {
   const IRIS_Z = EYEBALL_RADIUS - 0.5;
 
   const pupilMeshRef = useRef<THREE.Mesh>(null);
+  const pupilMatRef  = useRef<THREE.MeshPhysicalMaterial>(null);
   const insertionDepth = useSimulationStore((s) => s.insertionDepth);
 
   const irisTexture = useMemo(() => createIrisTexture(), []);
 
-  // Animate pupil size based on insertion depth
+  // Dilation + red-reflex emissive driven per frame
   useFrame(() => {
     if (!pupilMeshRef.current) return;
-    // Pupil scales from base radius (0.35 of iris outer) up to 0.8 at max insertion
     const baseRatio = 0.35;
-    const maxRatio = 0.8;
-    const maxDepth = 18;
+    const maxRatio  = 0.80;
+    const maxDepth  = 18;
     const ratio = baseRatio + (maxRatio - baseRatio) * Math.min(insertionDepth / maxDepth, 1);
-    const targetRadius = IRIS_OUTER_RADIUS * ratio;
-    const currentScale = targetRadius / (IRIS_OUTER_RADIUS * baseRatio);
-    pupilMeshRef.current.scale.set(currentScale, currentScale, 1);
+    pupilMeshRef.current.scale.set(ratio / baseRatio, ratio / baseRatio, 1);
+
+    if (pupilMatRef.current) {
+      const rrIntensity = microscope.getLightIntensities().redReflex;
+      const glow = Math.max(0, rrIntensity - 0.2) * 0.55;
+      pupilMatRef.current.emissiveIntensity = glow;
+      pupilMatRef.current.opacity = Math.max(0.50, 0.92 - glow * 0.5);
+      pupilMatRef.current.needsUpdate = true;
+    }
   });
 
   return (
@@ -236,17 +243,27 @@ export function Iris() {
           depthWrite={false}
         />
       </mesh>
+
+      {/* Pupil — semi-transparent so the red-reflex point light behind the lens
+          reaches the camera as a fundal glow; emissiveIntensity driven each frame. */}
       <mesh
         ref={pupilMeshRef}
         position={[0, 0, IRIS_Z - 0.02]}
         rotation={[0, 0, 0]}
       >
-        <circleGeometry args={[IRIS_OUTER_RADIUS * 0.35, 32]} />
+        <circleGeometry args={[IRIS_OUTER_RADIUS * 0.35, 48]} />
         <meshPhysicalMaterial
+          ref={pupilMatRef}
           color="#050510"
-          roughness={0.95}
+          emissive={new THREE.Color('#cc2200')}
+          emissiveIntensity={0}
+          transparent
+          opacity={0.92}
+          roughness={0.7}
           metalness={0.0}
-          clearcoat={0.8}
+          transmission={0.12}
+          thickness={1.0}
+          clearcoat={0.6}
           clearcoatRoughness={0.1}
           side={THREE.DoubleSide}
           depthTest={false}
@@ -295,3 +312,40 @@ export function LimbusRing() {
 }
 
 export { LIMBUS_Z };
+
+/**
+ * CapsulorhexisGuide — pulsing CCC target ring.
+ * Visible ONLY when procedure=cataract, procedureStarted=true,
+ * currentCurriculumStep='capsulorhexis'. Zero cost when hidden.
+ */
+const RHEXIS_RADIUS = EYEBALL_RADIUS * 0.205; // ≈ 5.5 mm
+
+export function CapsulorhexisGuide() {
+  const currentStep      = useSimulationStore((s) => s.currentCurriculumStep);
+  const procedureStarted = useSimulationStore((s) => s.procedureStarted);
+  const selectedProc     = useSimulationStore((s) => s.selectedProcedure);
+  const matRef           = useRef<THREE.MeshBasicMaterial>(null);
+
+  const visible = selectedProc === 'cataract' && procedureStarted && currentStep === 'capsulorhexis';
+
+  useFrame(({ clock }) => {
+    if (!matRef.current) return;
+    if (!visible) { matRef.current.opacity = 0; return; }
+    matRef.current.opacity = 0.38 + Math.sin(clock.elapsedTime * 2.8) * 0.12;
+  });
+
+  const geometry = useMemo(() => new THREE.TorusGeometry(RHEXIS_RADIUS, 0.08, 12, 96), []);
+
+  return (
+    <mesh geometry={geometry} position={[0, 0, 5.5]}>
+      <meshBasicMaterial
+        ref={matRef}
+        color="#ffe8a0"
+        transparent
+        opacity={0}
+        depthTest={false}
+        depthWrite={false}
+      />
+    </mesh>
+  );
+}

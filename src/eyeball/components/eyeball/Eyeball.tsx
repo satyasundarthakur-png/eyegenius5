@@ -1,5 +1,5 @@
 import { Sclera, EyeInterior, Retina } from './Sclera';
-import { Cornea, Iris, LimbusRing } from './Cornea';
+import { Cornea, Iris, LimbusRing, CapsulorhexisGuide } from './Cornea';
 import { Lens } from './Lens';
 import { TissueDeformation } from './TissueDeformation';
 import { BloodSimulation } from './BloodSimulation';
@@ -26,7 +26,8 @@ export function Eyeball() {
       <Sclera />
       <Retina />
       <EyeInterior />
-      <Lens />          {/* New in Step 2 — anatomically richer lens */}
+      <Lens />
+      <CapsulorhexisGuide />  {/* Pulsing CCC zone — visible during capsulorhexis step only */}
       <Iris />
       <Cornea />
       <LimbusRing />
