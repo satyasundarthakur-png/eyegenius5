@@ -32,10 +32,19 @@ export function RealTimeChart() {
     }));
   }, [chartData]);
 
-  // Hide entirely until real data arrives — avoids the dark "black spot"
-  // panel that appears at screen-centre before any needle movement.
+  // Chart is only mounted when HUD is visible (App.tsx gate).
+  // Show a minimal placeholder until needle data accumulates.
   if (chartData.length < 2) {
-    return null;
+    return (
+      <div className="pointer-events-auto fixed bottom-20 left-1/2 -translate-x-1/2 rounded-lg border border-blue-500/30 bg-gray-950/85 p-3 text-blue-100 backdrop-blur sm:bottom-24 sm:min-w-[280px] sm:p-4">
+        <h3 className="mb-1 border-b border-blue-500/20 pb-1 text-xs font-semibold tracking-wider text-blue-400 uppercase">
+          Depth Chart
+        </h3>
+        <div className="flex h-[80px] items-center justify-center text-xs text-blue-300/40">
+          Insert needle to begin recording
+        </div>
+      </div>
+    );
   }
 
   return (
