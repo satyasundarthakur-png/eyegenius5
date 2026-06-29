@@ -1,4 +1,4 @@
-import { OrbitControls, Environment } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { Eyeball } from '../eyeball/Eyeball';
 import { Needle } from '../needle/Needle';
 import { DepthRuler } from '../needle/DepthRuler';
@@ -30,11 +30,11 @@ export function Scene() {
   useChartDataCollector();
   useAutoPhaseTransition();
   usePhaseTransitionSound();
-  useBiomechanics(); // Step 5 - capsule elasticity & collision response
-  useFluidics();       // Step 6 - irrigation, aspiration, chamber stability
-  useCurriculum();     // Step 7 - cataract workflow validation & complications
-  useScoringAI();        // Step 8 - real-time scoring + AI coaching
-  useReplayAnalytics();  // Step 9 - enhanced replay with event annotations
+  useBiomechanics();
+  useFluidics();
+  useCurriculum();
+  useScoringAI();
+  useReplayAnalytics();
   const mode = useSimulationStore((s) => s.mode);
 
   return (
@@ -52,7 +52,9 @@ export function Scene() {
       <Annotations3D />
       <CollisionIndicator />
       <ScleraClickHandler />
-      <Environment preset="studio" background={false} />
+      {/* Environment preset removed — it fetches an external HDR that is
+          blocked in the Lovable sandbox, suspending the entire Canvas and
+          leaving the 3-D scene blank. Lighting.tsx provides full illumination. */}
       <OrbitControls
         enabled={mode !== 'EDIT'}
         enablePan={false}
