@@ -32,17 +32,10 @@ export function RealTimeChart() {
     }));
   }, [chartData]);
 
-  if (chartData.length < 2 && mode !== 'EDIT') {
-    return (
-      <div className="pointer-events-auto fixed bottom-20 left-1/2 -translate-x-1/2 rounded-lg border border-blue-500/30 bg-gray-950/85 p-3 text-blue-100 backdrop-blur sm:bottom-24 sm:min-w-[300px] sm:p-4 lg:w-auto lg:max-w-[400px]">
-        <h3 className="mb-2 border-b border-blue-500/20 pb-1 text-xs font-semibold tracking-wider text-blue-400 uppercase sm:mb-3 sm:text-sm">
-          Depth Chart
-        </h3>
-        <div className="flex h-[120px] items-center justify-center text-xs text-blue-300/50 sm:h-[150px]">
-          No data yet - start inserting needle
-        </div>
-      </div>
-    );
+  // Hide entirely until real data arrives — avoids the dark "black spot"
+  // panel that appears at screen-centre before any needle movement.
+  if (chartData.length < 2) {
+    return null;
   }
 
   return (
