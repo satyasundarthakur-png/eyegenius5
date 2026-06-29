@@ -15,7 +15,7 @@ import { ProcedureMenu } from './components/hud/ProcedureMenu';
 import { OperativeFieldBadge } from './components/hud/OperativeFieldBadge';
 import { HUDLayout, HUDPanel } from './components/hud/ResponsiveHUD';
 import { useThemeStore } from './stores/themeStore';
-import './index.css';
+
 
 function App() {
   const theme = useThemeStore((s) => s.theme);
