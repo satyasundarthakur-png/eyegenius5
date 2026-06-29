@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSimulationStore } from '../../stores/simulationStore';
-import { aiCoach } from '../../../../../packages/ai-engine/src/AICoach';
+import { aiCoach } from '../../../../packages/ai-engine/src/AICoach';
 
 const PRIORITY_STYLE: Record<string, string> = {
   high: 'border-red-500/40 bg-red-950/40 text-red-200',
