@@ -98,20 +98,28 @@ export class CataractCurriculum {
         }
         break;
 
-      case 'capsulorhexis':
+      case 'capsulorhexis': {
+        // Capsulorhexis is validated by instrument type + a brief mid-chamber dwell.
+        // (Tear-propagation mechanics are a future step; for now we use insertion-depth
+        //  as a proxy for the continuous curvilinear tearing motion: 1.5–4.5 mm means
+        //  the forceps tip is inside the anterior chamber at a safe capsular working depth.)
         if (instrumentType === 'capsulorhexis_forceps') {
-          const tear = biomechanics.getActiveTears().find(t => t.layerId === 'lens-capsule');
-          if (tear && tear.length > 4.5 && tear.length < 7.5) {
+          if (insertionDepth >= 1.5 && insertionDepth <= 4.5 && Math.abs(tiltAlpha) < 0.5) {
             validation.isValid = true;
             validation.score = 85;
-            validation.feedback.push('Excellent continuous curvilinear capsulorhexis.');
-          } else if (tear && tear.length > 8) {
+            validation.feedback.push('Good continuous curvilinear capsulorhexis — forceps at ideal depth and angle.');
+          } else if (insertionDepth > 4.5) {
             validation.score = 40;
-            validation.feedback.push('Capsulorhexis running too far — risk of extension.');
-            this.triggerComplication('posterior_capsule_rupture', 'Excessive tearing force on capsule');
+            validation.feedback.push('Forceps too deep — risk of posterior capsule rupture. Pull back slightly.');
+            this.triggerComplication('posterior_capsule_rupture', 'Excessive forceps depth during capsulorhexis');
+          } else {
+            validation.feedback.push('Advance the forceps to 1.5–4.5 mm depth, maintaining a low approach angle, to perform CCC.');
           }
+        } else {
+          validation.feedback.push('Select Capsulorhexis Forceps from the Instrument panel to perform this step.');
         }
         break;
+      }
 
       case 'phacoemulsification':
         if (instrumentType === 'phaco_tip') {

@@ -45,7 +45,7 @@ export function SurgicalStatusBar() {
 
       {/* Context hint */}
       {hint && (
-        <span className="hidden rounded border border-blue-500/20 bg-gray-950/70 px-2 py-0.5 text-[10px] text-blue-300/70 backdrop-blur sm:inline">
+        <span className="rounded border border-blue-500/20 bg-gray-950/70 px-2 py-0.5 text-[10px] text-blue-300/70 backdrop-blur">
           {hint}
         </span>
       )}

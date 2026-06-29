@@ -17,6 +17,9 @@ import { OperativeFieldBadge } from './components/hud/OperativeFieldBadge';
 import { SurgicalStatusBar } from './components/hud/SurgicalStatusBar';
 import { HUDLayout, HUDPanel } from './components/hud/ResponsiveHUD';
 import { useThemeStore } from './stores/themeStore';
+import { useState as useOnboardState } from 'react';
+import { OnboardingOverlay, hasSeenOnboarding } from './components/OnboardingOverlay';
+import { StepGuide } from './components/hud/StepGuide';
 
 /**
  * App — OpenEyeSim root shell
@@ -33,6 +36,7 @@ import { useThemeStore } from './stores/themeStore';
 function App() {
   const theme = useThemeStore((s) => s.theme);
   const [showHUD, setShowHUD] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useOnboardState(() => !hasSeenOnboarding());
 
   const bgColor = theme === 'dark' ? '#0a0a1a' : '#f5f5f0';
 
@@ -121,6 +125,14 @@ function App() {
           <RCMPointList />
           <RealTimeChart />
         </>
+      )}
+
+      {/* ── Always visible: step instruction strip ── */}
+      <StepGuide />
+
+      {/* ── First-visit onboarding overlay ── */}
+      {showOnboarding && (
+        <OnboardingOverlay onDismiss={() => { setShowOnboarding(false); setShowHUD(true); }} />
       )}
 
       {/* ── Always visible: ☰ Help toggle ── */}

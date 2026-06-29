@@ -29,11 +29,15 @@ export function CurriculumPanel() {
   const validation = useSimulationStore((s) => s.curriculumValidation);
   const complications = useSimulationStore((s) => s.complications);
   const advanceCurriculumStep = useSimulationStore((s) => s.advanceCurriculumStep);
+  const validateCurrentCurriculumStep = useSimulationStore((s) => s.validateCurrentCurriculumStep);
   const resetCurriculum = useSimulationStore((s) => s.resetCurriculum);
   const selectedProcedure = useSimulationStore((s) => s.selectedProcedure);
   const procedureStarted = useSimulationStore((s) => s.procedureStarted);
   const startProcedure = useSimulationStore((s) => s.startProcedure);
   const endProcedure = useSimulationStore((s) => s.endProcedure);
+  const currentInstrument = useSimulationStore((s) => s.currentInstrument);
+  const insertionDepth = useSimulationStore((s) => s.insertionDepth);
+  const tiltAlpha = useSimulationStore((s) => s.tiltAlpha);
 
   const currentIndex = STEP_ORDER.indexOf(currentStep);
   const procedureInfo = PROCEDURES.find((p) => p.id === selectedProcedure);
@@ -145,6 +149,16 @@ export function CurriculumPanel() {
           )}
 
           <button
+            onClick={() => {
+              if (currentInstrument) {
+                validateCurrentCurriculumStep(currentInstrument.getType(), insertionDepth, tiltAlpha);
+              }
+            }}
+            className="mb-1.5 w-full rounded border border-blue-500/30 px-2 py-1 text-xs font-medium text-blue-300 hover:bg-blue-500/10"
+          >
+            ↻ Validate current step
+          </button>
+          <button
             onClick={advanceCurriculumStep}
             disabled={!validation?.isValid}
             className={`w-full rounded px-2 py-1.5 text-xs font-medium transition-colors ${
@@ -153,7 +167,7 @@ export function CurriculumPanel() {
                 : 'cursor-not-allowed bg-gray-800 text-gray-500'
             }`}
           >
-            Advance to next step
+            {validation?.isValid ? '✓ Advance to next step' : 'Advance to next step'}
           </button>
         </>
       )}
