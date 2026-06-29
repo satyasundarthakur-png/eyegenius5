@@ -66,19 +66,28 @@ export function useMouseControl() {
   }
 
   function handlePointerMove(e: ThreeEvent<PointerEvent>) {
-    // EDIT mode: dragging adjusts tilt angles
+    // EDIT mode:
+    //   horizontal drag (dx) → tiltBeta  (azimuth — swing needle left/right)
+    //   vertical   drag (dy) → insertionDepth
+    //       drag DOWN (+dy) = push needle deeper
+    //       drag UP   (-dy) = retract needle
+    // tiltAlpha (elevation) is set via keyboard presets 1-4 or the ControlPanel slider.
     if (mode === 'EDIT' && isDragging.current && rcmPointSet) {
       const dx = e.clientX - lastMouse.current.x;
       const dy = e.clientY - lastMouse.current.y;
       lastMouse.current = { x: e.clientX, y: e.clientY };
 
-      const sensitivity = 0.005;
-      const newBeta = tiltBeta + dx * sensitivity;
-      const newAlpha = Math.max(
-        -MAX_TILT_ANGLE,
-        Math.min(MAX_TILT_ANGLE, tiltAlpha + dy * sensitivity)
+      // Azimuth rotation
+      const newBeta = tiltBeta + dx * 0.005;
+      setTiltAngles(tiltAlpha, newBeta);
+
+      // Insertion depth — 0.12 mm/px gives ~150 px for full 18 mm range
+      const currentDepth = useSimulationStore.getState().insertionDepth;
+      const newDepth = Math.max(
+        0,
+        Math.min(currentDepth + dy * 0.12, MAX_INSERTION_DEPTH)
       );
-      setTiltAngles(newAlpha, newBeta);
+      setInsertionDepth(newDepth);
       return;
     }
 
