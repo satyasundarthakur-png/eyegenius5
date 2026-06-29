@@ -35,7 +35,13 @@ export function Scene() {
   useCurriculum();
   useScoringAI();
   useReplayAnalytics();
-  const mode = useSimulationStore((s) => s.mode);
+  const mode  = useSimulationStore((s) => s.mode);
+  const phase = useSimulationStore((s) => s.phase);
+
+  // Eye fixation: lock the camera whenever surgery is in progress.
+  // EDIT mode already disabled orbit; this additionally locks VIEW/PLACE
+  // once the phase moves past IDLE so the operative field stays stable.
+  const orbitEnabled = mode !== 'EDIT' && phase === 'IDLE';
 
   return (
     <>
@@ -52,11 +58,8 @@ export function Scene() {
       <Annotations3D />
       <CollisionIndicator />
       <ScleraClickHandler />
-      {/* Environment preset removed — it fetches an external HDR that is
-          blocked in the Lovable sandbox, suspending the entire Canvas and
-          leaving the 3-D scene blank. Lighting.tsx provides full illumination. */}
       <OrbitControls
-        enabled={mode !== 'EDIT'}
+        enabled={orbitEnabled}
         enablePan={false}
         minDistance={15}
         maxDistance={60}
