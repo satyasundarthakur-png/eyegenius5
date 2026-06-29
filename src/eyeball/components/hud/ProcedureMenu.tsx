@@ -1,5 +1,14 @@
+import { Droplet, Eye, Microscope, Scissors } from 'lucide-react';
 import { useSimulationStore } from '../../stores/simulationStore';
-import { PROCEDURES } from '../../stores/procedureSlice';
+import { PROCEDURES, type SurgicalProcedure } from '../../stores/procedureSlice';
+
+/** One icon per surgical module — quick visual recognition at a glance. */
+const PROCEDURE_ICONS: Record<SurgicalProcedure, typeof Eye> = {
+  cataract: Scissors,
+  retina: Eye,
+  glaucoma: Droplet,
+  cornea: Microscope,
+};
 
 export function ProcedureMenu() {
   const selectedProcedure = useSimulationStore((s) => s.selectedProcedure);
@@ -13,22 +22,27 @@ export function ProcedureMenu() {
         Surgical Procedure
       </h3>
 
-      <div className="grid grid-cols-2 gap-1.5">
+      <div className="grid grid-cols-2 gap-2">
         {PROCEDURES.map((proc) => {
           const isActive = proc.id === selectedProcedure;
+          const Icon = PROCEDURE_ICONS[proc.id];
           return (
             <button
               key={proc.id}
               onClick={() => {
                 setProcedure(proc.id);
               }}
-              className={`relative rounded px-2 py-1.5 text-left text-xs font-medium transition-colors ${
+              className={`relative flex items-center gap-1.5 rounded px-2 py-1.5 text-left text-xs font-medium transition-colors ${
                 isActive
                   ? 'border border-blue-400 bg-blue-600 text-white'
-                  : 'border border-transparent text-gray-400 hover:bg-gray-800 hover:text-gray-200'
+                  : 'border border-transparent text-gray-300 hover:bg-gray-800 hover:text-gray-100'
               }`}
             >
-              {proc.name.replace(' Surgery', '')}
+              <Icon
+                className={`h-3.5 w-3.5 flex-shrink-0 ${isActive ? 'text-white' : 'text-blue-400/70'}`}
+                aria-hidden="true"
+              />
+              <span>{proc.name.replace(' Surgery', '')}</span>
               {!proc.hasGuidedCurriculum && (
                 <span className="absolute top-0.5 right-1 text-[8px] uppercase tracking-wide text-amber-400/80">
                   beta
