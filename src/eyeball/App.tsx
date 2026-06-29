@@ -14,22 +14,21 @@ import { CurriculumPanel } from './components/hud/CurriculumPanel';
 import { ScoreCoachPanel } from './components/hud/ScoreCoachPanel';
 import { ProcedureMenu } from './components/hud/ProcedureMenu';
 import { OperativeFieldBadge } from './components/hud/OperativeFieldBadge';
+import { SurgicalStatusBar } from './components/hud/SurgicalStatusBar';
 import { HUDLayout, HUDPanel } from './components/hud/ResponsiveHUD';
 import { useThemeStore } from './stores/themeStore';
 
 /**
  * App — OpenEyeSim root shell
  *
- * Surgery-first UI: the 3-D scene fills the entire screen with NO panels
- * overlaid, giving the surgeon a clean operative field. A single floating
- * "☰ Help" button (always visible, top-right) slides in the full HUD panel
- * set. Pressing "✕ Close" returns to the clean surgical view.
+ * Surgery-first UI: clean 3-D operative field by default.
  *
- * Components hidden during surgery:
- *   - KinematicsPanel  (was the black band across the upper-left)
- *   - RealTimeChart    (was the dark "depth chart" black spot at centre)
- *   - All side panels  (Procedure, Instrument, Microscope, Curriculum, etc.)
- *   - ModePanel, MiniMap, RCMPointList, OperativeFieldBadge
+ * Always visible (zero HUD clutter during surgery):
+ *   • SurgicalStatusBar — bottom-left phase / mode pill + 1-line control hint
+ *   • ☰ Help toggle — top-right corner
+ *
+ * Revealed only when surgeon presses ☰ Help:
+ *   • KinematicsPanel, all side panels, RCMPointList, RealTimeChart
  */
 function App() {
   const theme = useThemeStore((s) => s.theme);
@@ -60,7 +59,10 @@ function App() {
         </Canvas>
       </div>
 
-      {/* ── HUD panel stack: hidden during surgery, revealed via Help button ── */}
+      {/* ── Always visible: phase / mode status + control hint ── */}
+      <SurgicalStatusBar />
+
+      {/* ── HUD panel stack: hidden during surgery ── */}
       {showHUD && (
         <>
           <HUDLayout
@@ -70,8 +72,8 @@ function App() {
               </HUDPanel>
             }
             topRight={
-              /* Leave space for the Help button (top-right corner) */
-              <div className="mr-24 space-y-2">
+              /* Leave room for the Help button at top-right */
+              <div className="mr-28 space-y-2">
                 <ModePanel />
                 <HUDPanel title="Operative Eye">
                   <OperativeFieldBadge />
@@ -107,30 +109,33 @@ function App() {
               </HUDPanel>
             }
             bottomLeft={
-              <HUDPanel title="Minimap" defaultOpen={true}>
-                <MiniMap />
-              </HUDPanel>
+              /* Status bar lives at bottom-left; give minimap a slight offset */
+              <div className="mb-10">
+                <HUDPanel title="Minimap" defaultOpen={true}>
+                  <MiniMap />
+                </HUDPanel>
+              </div>
             }
           />
+          {/* RCMPointList is positioned absolute top-16 right-4 inside itself */}
           <RCMPointList />
           <RealTimeChart />
         </>
       )}
 
-      {/* ── Always-visible toggle: sole UI element during surgery ── */}
+      {/* ── Always visible: ☰ Help toggle ── */}
       <button
         onClick={() => { setShowHUD((v) => !v); }}
         className={`
           pointer-events-auto fixed right-4 top-4 z-50
-          flex items-center gap-2 rounded-lg px-3 py-2
+          flex items-center gap-1.5 rounded-lg border px-3 py-2
           text-xs font-semibold backdrop-blur transition-all duration-200
-          border
           ${showHUD
             ? 'border-red-500/50 bg-gray-950/90 text-red-300 hover:border-red-400 hover:text-red-100'
             : 'border-blue-500/50 bg-gray-950/80 text-blue-300 hover:border-blue-400 hover:text-blue-100'
           }
         `}
-        title={showHUD ? 'Hide panels (return to surgical view)' : 'Show panels (Help / Settings)'}
+        title={showHUD ? 'Hide panels' : 'Show panels / Help'}
       >
         {showHUD ? '✕ Close' : '☰ Help'}
       </button>
