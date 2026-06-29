@@ -216,7 +216,7 @@ export function Iris() {
 
   return (
     <>
-      <mesh position={[0, 0, IRIS_Z]} rotation={[Math.PI / 2, 0, 0]}>
+      <mesh position={[0, 0, IRIS_Z]} rotation={[0, 0, 0]}>
         <ringGeometry args={[IRIS_OUTER_RADIUS * 0.35, IRIS_OUTER_RADIUS, 64]} />
         <meshPhysicalMaterial
           map={irisTexture}
@@ -239,7 +239,7 @@ export function Iris() {
       <mesh
         ref={pupilMeshRef}
         position={[0, 0, IRIS_Z - 0.02]}
-        rotation={[Math.PI / 2, 0, 0]}
+        rotation={[0, 0, 0]}
       >
         <circleGeometry args={[IRIS_OUTER_RADIUS * 0.35, 32]} />
         <meshPhysicalMaterial
