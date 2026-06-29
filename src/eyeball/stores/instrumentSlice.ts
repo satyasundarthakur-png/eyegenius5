@@ -11,8 +11,8 @@ import {
   Vitrector,
   Endolaser,
   MicroForceps,
-} from '../../packages/instrument-engine/src';
-import type { InstrumentType } from '../../packages/instrument-engine/src/types/instrument';
+} from '../../../packages/instrument-engine/src';
+import type { InstrumentType } from '../../../packages/instrument-engine/src/types/instrument';
 
 export interface InstrumentSlice {
   currentInstrument: Instrument | null;

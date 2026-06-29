@@ -1,7 +1,7 @@
 import type { StateCreator } from 'zustand';
 import type { SimulationState } from './simulationStore';
-import { biomechanics } from '../../packages/physics-engine/src';
-import type { LayerId } from '../../packages/anatomy-engine/types/anatomy';
+import { biomechanics } from '../../../packages/physics-engine/src';
+import type { LayerId } from '../../../packages/anatomy-engine/types/anatomy';
 import type { Vec3 } from '../types';
 
 export interface PhysicsSlice {

@@ -1,6 +1,6 @@
 import { useFrame } from '@react-three/fiber';
 import { useSimulationStore } from '../stores/simulationStore';
-import { biomechanics } from '../../packages/physics-engine/src/Biomechanics';
+import { biomechanics } from '../../../packages/physics-engine/src/Biomechanics';
 import type { Vec3 } from '../types';
 
 /**

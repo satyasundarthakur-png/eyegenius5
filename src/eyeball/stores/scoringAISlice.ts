@@ -1,10 +1,10 @@
 import type { StateCreator } from 'zustand';
 import type { SimulationState } from './simulationStore';
-import { scoringEngine } from '../../packages/scoring-engine/src/ScoringEngine';
-import { aiCoach, type CoachingFeedback } from '../../packages/ai-engine/src/AICoach';
-import type { ScoringSession } from '../../packages/scoring-engine/src/types/scoring';
-import type { InstrumentPose } from '../../packages/instrument-engine/src/types/instrument';
-import type { CataractStep } from '../../packages/curriculum/src/types/curriculum';
+import { scoringEngine } from '../../../packages/scoring-engine/src/ScoringEngine';
+import { aiCoach, type CoachingFeedback } from '../../../packages/ai-engine/src/AICoach';
+import type { ScoringSession } from '../../../packages/scoring-engine/src/types/scoring';
+import type { InstrumentPose } from '../../../packages/instrument-engine/src/types/instrument';
+import type { CataractStep } from '../../../packages/curriculum/src/types/curriculum';
 
 export interface ScoringAISlice {
   scoring: ScoringSession;

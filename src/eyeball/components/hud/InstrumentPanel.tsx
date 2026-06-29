@@ -1,6 +1,6 @@
 import { useSimulationStore } from '../../stores/simulationStore';
 import { PROCEDURES } from '../../stores/procedureSlice';
-import type { InstrumentType } from '../../../packages/instrument-engine/src/types/instrument';
+import type { InstrumentType } from '../../../../../packages/instrument-engine/src/types/instrument';
 
 /** Short labels for the instrument picker buttons (full name shown as the active readout). */
 const SHORT_LABEL: Record<InstrumentType, string> = {

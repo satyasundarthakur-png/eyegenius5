@@ -4,7 +4,7 @@ import { useCollisionDetection } from '../../hooks/useCollisionDetection';
 import { useInsertionForce } from '../../hooks/useInsertionForce';
 import { CurvedNeedleTip } from './CurvedNeedleTip';
 import { forceToColor } from '../../lib/forceColor';
-import type { TipGeometryDescriptor } from '../../../packages/instrument-engine/src/types/instrument';
+import type { TipGeometryDescriptor } from '../../../../../packages/instrument-engine/src/types/instrument';
 
 interface InstrumentTipProps {
   position: [number, number, number];

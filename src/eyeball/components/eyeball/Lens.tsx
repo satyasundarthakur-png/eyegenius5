@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { useMemo } from 'react';
-import { eyeAnatomy } from '../../../packages/anatomy-engine/src/EyeAnatomy';
+import { eyeAnatomy } from '../../../../../packages/anatomy-engine/src/EyeAnatomy';
 
 /**
  * Anatomically improved Lens assembly (Step 2)

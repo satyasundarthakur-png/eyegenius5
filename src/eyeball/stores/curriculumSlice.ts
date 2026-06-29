@@ -1,6 +1,6 @@
 import type { StateCreator } from 'zustand';
 import type { SimulationState } from './simulationStore';
-import { cataractCurriculum, type CataractStep, type StepValidation, type Complication } from '../../packages/curriculum/src';
+import { cataractCurriculum, type CataractStep, type StepValidation, type Complication } from '../../../packages/curriculum/src';
 
 export interface CurriculumSlice {
   currentCurriculumStep: CataractStep;

@@ -1,6 +1,6 @@
 import type { StateCreator } from 'zustand';
 import type { SimulationState } from './simulationStore';
-import { replayEngine, type ReplaySession } from '../../packages/replay-engine/src';
+import { replayEngine, type ReplaySession } from '../../../packages/replay-engine/src';
 
 export interface ReplayAnalyticsSlice {
   currentReplaySession: ReplaySession | null;

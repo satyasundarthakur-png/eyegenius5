@@ -1,6 +1,6 @@
 import type { StateCreator } from 'zustand';
 import type { SimulationState } from './simulationStore';
-import type { InstrumentType } from '../../packages/instrument-engine/src/types/instrument';
+import type { InstrumentType } from '../../../packages/instrument-engine/src/types/instrument';
 
 export type SurgicalProcedure = 'cataract' | 'retina' | 'glaucoma' | 'cornea';
 export type EyeSide = 'OD' | 'OS';

@@ -1,6 +1,6 @@
 import type { StateCreator } from 'zustand';
 import type { SimulationState } from './simulationStore';
-import { microscope, type MicroscopeState } from '../../packages/microscope-engine/src/Microscope';
+import { microscope, type MicroscopeState } from '../../../packages/microscope-engine/src/Microscope';
 
 export interface MicroscopeSlice {
   microscope: MicroscopeState;

@@ -1,5 +1,5 @@
 import { useSimulationStore } from '../../stores/simulationStore';
-import { microscope } from '../../../packages/microscope-engine/src/Microscope';
+import { microscope } from '../../../../../packages/microscope-engine/src/Microscope';
 
 /**
  * Lighting setup enhanced with virtual operating microscope illumination (Step 3).
