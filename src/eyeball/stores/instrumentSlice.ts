@@ -48,12 +48,21 @@ export const createInstrumentSlice: StateCreator<SimulationState, [], [], Instru
       const instruments = get().availableInstruments;
       const found = instruments.find(i => i.getType() === type);
       if (found) {
-        // Deactivate previous
+        // Deactivate previous instrument
         const previous = get().currentInstrument;
-        if (previous) {
-          previous.setActive(false);
-        }
+        if (previous) previous.setActive(false);
+
         found.setActive(true);
+
+        // ── Critical: transfer the placed RCM to the new instrument ──────
+        // Without this, computePose() returns null on every instrument switch,
+        // the 3D needle freezes, and fluidics never sees instrumentActive=true.
+        const { rcmPoints, currentRCMIndex } = get();
+        const currentRCM = rcmPoints[currentRCMIndex];
+        if (currentRCM) {
+          found.setRCM(currentRCM.point, currentRCM.normal);
+        }
+
         set({ currentInstrument: found });
       }
     },
