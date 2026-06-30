@@ -40,6 +40,9 @@ export const createCurriculumSlice: StateCreator<SimulationState, [], [], Curric
 
   resetCurriculum: () => {
     cataractCurriculum.reset();
+    // Reset fluidics so the next surgery starts with a collapsed AC (pressure 8 mmHg),
+    // not whatever stable state the previous run left behind.
+    get().resetFluidics();
     set({
       currentCurriculumStep: cataractCurriculum.getCurrentStep(),
       curriculumValidation: null,
