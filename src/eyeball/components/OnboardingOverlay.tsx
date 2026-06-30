@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { ChevronRight, ChevronLeft, X } from 'lucide-react';
 
-const STORAGE_KEY = 'openeyesim-onboarded-v2';
+const STORAGE_KEY = 'openeyesim-onboarded-v3';
 
 // ─── Surgery data ────────────────────────────────────────────────────────────
 
