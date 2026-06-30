@@ -18,10 +18,13 @@ export const createFluidSlice: StateCreator<SimulationState, [], [], FluidSlice>
   fluidicsEnabled: true,
 
   updateFluidics: (deltaTime) => {
-    const currentInstrument = get().currentInstrument;
-    const pose = currentInstrument?.getState().pose;
-    const instrumentActive = !!pose && pose.insertionDepth > 0.1;
-    const type = currentInstrument?.getType();
+    // Use store insertionDepth directly — never blocked by a missing pose.
+    // (Previously: !!pose && pose.insertionDepth > 0.1 — pose=null after every
+    // instrument switch meant instrumentActive=false → irrigation never ran →
+    // isStable stayed false → hydrodissection/phaco/cortex steps blocked forever.)
+    const insertionDepth = get().insertionDepth;
+    const type = get().currentInstrument?.getType();
+    const instrumentActive = insertionDepth > 0.1;
 
     fluidics.update(deltaTime, instrumentActive, type);
     set({ fluidics: fluidics.getState() });
