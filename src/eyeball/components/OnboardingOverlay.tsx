@@ -46,21 +46,21 @@ const SURGERIES: SurgeryInfo[] = [
         num: 'Setup',
         title: 'Open the panels',
         icon: '☰',
-        action: 'Press the ☰ Help button (top-right corner). In the Cataract Curriculum panel click "Start Procedure". The eye fixates once you place an RCM point.',
+        action: 'Press the ☰ Help button (top-right corner). In the Cataract Curriculum panel click "Start Procedure". The eye fixates once you mark an entry point.',
         tip: 'All panels are hidden during surgery to keep the operative field clean.',
       },
       {
         num: 'Place',
-        title: 'Place the entry point (RCM)',
+        title: 'Mark the entry point',
         icon: '📍',
         action: 'Press P to enter PLACE mode, then click the eye surface near the limbus (3 o\'clock position for a right eye). A green marker locks the keratome entry.',
-        tip: 'The camera locks once RCM is placed — you can no longer orbit the eye.',
+        tip: 'The camera locks once the entry point is marked — you can no longer orbit the eye.',
       },
       {
         num: 'Controls',
         title: 'Instrument controls',
         icon: '🖱️',
-        action: 'In Edit mode (auto after RCM placement): drag ↔ to swing azimuth · drag ↕ to advance / withdraw · scroll wheel for fine depth · keys 1-4 for elevation presets (0° 15° 30° 45°).',
+        action: 'In Operate mode (auto after marking the entry point): drag ↔ to swing the instrument · drag ↕ to advance / withdraw · scroll wheel for fine depth · keys 1-4 for approach-angle presets (0° 15° 30° 45°).',
         tip: 'Dragging DOWN pushes the needle into the eye. Dragging UP retracts it.',
       },
       {
@@ -139,7 +139,7 @@ const SURGERIES: SurgeryInfo[] = [
         title: 'Place pars plana entry',
         icon: '📍',
         action: 'Press P and click the sclera ~3.5 mm posterior to the limbus (the pars plana zone). This is your trocar entry site for all three instruments.',
-        tip: 'Three-port vitrectomy normally uses three separate trocar sites. The simulator uses one RCM point.',
+        tip: 'Three-port vitrectomy normally uses three separate trocar sites. The simulator uses a single entry point.',
       },
       {
         num: 'Step 1',
@@ -303,7 +303,7 @@ export function OnboardingOverlay({ onDismiss }: Props) {
           <div className="mb-8 grid w-full max-w-xs grid-cols-2 gap-2 text-left">
             {[
               ['☰ Help',    'Toggle panels on / off'],
-              ['P key',     'Place RCM entry point'],
+              ['P key',     'Mark the entry point'],
               ['Drag ↕',    'Insert / withdraw needle'],
               ['1 2 3 4',   'Elevation angle presets'],
             ].map(([k, v]) => (
