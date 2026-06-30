@@ -1,5 +1,6 @@
 import { useSimulationStore } from '../../stores/simulationStore';
 import { useNeedlePose } from '../../hooks/useNeedlePose';
+import { TELEMETRY_PANEL_LABEL, ENTRY_POINT_LABEL } from '../../constants/terminology';
 import { usePhaseTransitionFlash } from '../../hooks/usePhaseTransition';
 
 const phaseColorMap: Record<string, string> = {
@@ -19,7 +20,7 @@ export function KinematicsPanel() {
   return (
     <div className="pointer-events-auto w-full rounded-lg border border-blue-500/30 bg-gray-950/85 p-3 text-blue-100 backdrop-blur sm:min-w-[240px] sm:p-4">
       <h3 className="mb-2 border-b border-blue-500/20 pb-1 text-xs font-semibold tracking-wider text-blue-400 uppercase sm:mb-3 sm:text-sm">
-        Kinematics
+        {TELEMETRY_PANEL_LABEL}
       </h3>
       {pose ? (
         <table className="w-full border-collapse text-sm">
@@ -59,26 +60,26 @@ export function KinematicsPanel() {
               </td>
             </tr>
             <tr>
-              <td className="py-1 pr-3 text-blue-300/70">Insertion</td>
+              <td className="py-1 pr-3 text-blue-300/70">Insertion Depth</td>
               <td className="py-1 text-right font-mono text-xs">
                 {pose.insertionDepth.toFixed(2)} mm
               </td>
             </tr>
             <tr>
-              <td className="py-1 pr-3 text-blue-300/70">Tilt Alpha</td>
+              <td className="py-1 pr-3 text-blue-300/70">Approach Angle</td>
               <td className="py-1 text-right font-mono text-xs">
                 {(pose.tiltAlpha * (180 / Math.PI)).toFixed(1)} deg
               </td>
             </tr>
             <tr>
-              <td className="py-1 pr-3 text-blue-300/70">Tilt Beta</td>
+              <td className="py-1 pr-3 text-blue-300/70">Swing Angle</td>
               <td className="py-1 text-right font-mono text-xs">
                 {(pose.tiltBeta * (180 / Math.PI)).toFixed(1)} deg
               </td>
             </tr>
             {rcmPoint && (
               <tr>
-                <td className="py-1 pr-3 text-blue-300/70">RCM</td>
+                <td className="py-1 pr-3 text-blue-300/70">{ENTRY_POINT_LABEL}</td>
                 <td className="py-1 text-right font-mono text-xs">
                   [{rcmPoint[0].toFixed(1)}, {rcmPoint[1].toFixed(1)}, {rcmPoint[2].toFixed(1)}]
                 </td>
