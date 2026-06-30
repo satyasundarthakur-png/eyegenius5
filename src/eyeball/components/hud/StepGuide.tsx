@@ -41,7 +41,7 @@ const STEP_GUIDE: Record<string, { title: string; action: string; instrument: st
 
 const PLACE_GUIDE = {
   title: 'Place Entry Point',
-  action: 'Click anywhere on the white sclera to set the instrument entry (RCM) point.',
+  action: 'Click anywhere on the white sclera to set the instrument entry point.',
   instrument: '',
 };
 
