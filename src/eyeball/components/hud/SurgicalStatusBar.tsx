@@ -1,4 +1,5 @@
 import { useSimulationStore } from '../../stores/simulationStore';
+import { MODE_DISPLAY, MODE_HINT } from '../../constants/terminology';
 
 const PHASE_COLOR: Record<string, string> = {
   IDLE:       'text-gray-400 border-gray-500/40 bg-gray-800/70',
@@ -6,13 +7,6 @@ const PHASE_COLOR: Record<string, string> = {
   INSERTING:  'text-green-300 border-green-500/40 bg-green-950/70',
   WITHDRAWING:'text-amber-300 border-amber-500/40 bg-amber-950/70',
   COMPLETE:   'text-emerald-300 border-emerald-500/40 bg-emerald-950/70',
-};
-
-const MODE_HINT: Record<string, string> = {
-  VIEW:   'Observation — press P to place RCM',
-  PLACE:  'Click the eyeball surface to set RCM entry point',
-  EDIT:   'Drag ↔ azimuth · Drag ↕ depth · Scroll fine · 1-4 elevation presets',
-  REPLAY: 'Playback mode — use Controls panel to adjust speed',
 };
 
 /**
@@ -40,7 +34,7 @@ export function SurgicalStatusBar() {
 
       {/* Mode pill */}
       <span className="rounded-full border border-blue-500/30 bg-gray-950/80 px-2.5 py-0.5 text-[11px] font-semibold tracking-wider text-blue-400 uppercase backdrop-blur">
-        {mode}
+        {MODE_DISPLAY[mode] ?? mode}
       </span>
 
       {/* Context hint */}
