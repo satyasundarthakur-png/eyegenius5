@@ -1,6 +1,7 @@
 import { Html } from '@react-three/drei';
 import { useSimulationStore } from '../../stores/simulationStore';
 import { useMemo } from 'react';
+import { ENTRY_POINT_LABEL } from '../../constants/terminology';
 import * as THREE from 'three';
 
 /**
@@ -55,7 +56,7 @@ export function ObjectLabels() {
       {/* RCM Point Label — offset, not centered on the marker */}
       <Html position={rcmLabelPos} center={false} distanceFactor={8} zIndexRange={[0, 0]}>
         <div className="pointer-events-none -translate-y-1/2 rounded bg-blue-950/90 px-2 py-1 text-[10px] text-blue-100 shadow-lg backdrop-blur-sm border border-blue-500/30">
-          <div className="font-semibold text-blue-400">RCM Point</div>
+          <div className="font-semibold text-blue-400">{ENTRY_POINT_LABEL}</div>
           <div className="font-mono">
             [{rcmPoint[0].toFixed(1)}, {rcmPoint[1].toFixed(1)}, {rcmPoint[2].toFixed(1)}]
           </div>
