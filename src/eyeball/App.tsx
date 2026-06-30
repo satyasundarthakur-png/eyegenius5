@@ -43,7 +43,8 @@ function App() {
   const setProcedure = useSimulationStore((s) => s.setProcedure);
 
   const [showIntro, setShowIntro] = useState(() => !hasSeenOnboarding());
-  const [showHUD,   setShowHUD]   = useState(false);
+  const showHUD     = useSimulationStore((s) => s.showHUD);
+  const setShowHUD  = useSimulationStore((s) => s.setShowHUD);
 
   const bgColor = theme === 'dark' ? '#0a0a1a' : '#f5f5f0';
 
