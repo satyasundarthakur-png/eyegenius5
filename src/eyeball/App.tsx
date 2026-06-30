@@ -16,7 +16,7 @@ import { ProcedureMenu } from './components/hud/ProcedureMenu';
 import { OperativeFieldBadge } from './components/hud/OperativeFieldBadge';
 import { SurgicalStatusBar } from './components/hud/SurgicalStatusBar';
 import { OnboardingOverlay, hasSeenOnboarding } from './components/OnboardingOverlay';
-import { HUDLayout, HUDPanel } from './components/hud/ResponsiveHUD';
+import { HUDSidebar, HUDPanel } from './components/hud/ResponsiveHUD';
 import { useThemeStore } from './stores/themeStore';
 import { useSimulationStore } from './stores/simulationStore';
 import type { SurgicalProcedure } from './stores/procedureSlice';
@@ -24,16 +24,19 @@ import type { SurgicalProcedure } from './stores/procedureSlice';
 /**
  * App — OpenEyeSim root shell
  *
- * On first load (or after clearing localStorage), a full-screen intro flow runs:
- *   Screen 1 — Welcome splash + key-bindings cheat-sheet
- *   Screen 2 — Surgery selector (Cataract · Vitreoretinal · Glaucoma · Corneal)
- *   Screen 3 — Surgery-specific step-by-step walkthrough
- * "Enter Simulation" on the last step auto-selects the chosen procedure and
- * dismisses the overlay.
+ * HUD layout: two independent single-column sidebars (left / right), each
+ * one continuous scrollable flex stack. Panels are ordered by how often a
+ * surgeon needs them — most-used at top, rarely-used collapsed by default.
+ * This structurally prevents the overlap bug from the old 3-row grid: every
+ * panel simply pushes the next one down in normal document flow.
  *
- * During surgery the screen is clean (Canvas only). The ☰ Help button
- * (top-right) toggles all HUD panels. SurgicalStatusBar (bottom-left)
- * always shows phase + mode + a context hint.
+ *   LEFT sidebar  — Mode & Eye, Procedure, Instrument, Microscope, Kinematics
+ *   RIGHT sidebar — Curriculum (primary), Depth Chart, Controls, RCM Points,
+ *                   Score & AI Coach
+ *
+ * During surgery the screen is clean (Canvas only). ☰ Help (top-right)
+ * toggles all panels. SurgicalStatusBar (bottom-left) always shows
+ * phase + mode + a context hint, independent of the HUD.
  */
 function App() {
   const theme        = useThemeStore((s) => s.theme);
@@ -45,7 +48,6 @@ function App() {
   const bgColor = theme === 'dark' ? '#0a0a1a' : '#f5f5f0';
 
   function handleIntroDismiss(selectedProcedure: SurgicalProcedure) {
-    // Auto-select the procedure the user chose during the intro walkthrough
     setProcedure(selectedProcedure);
     setShowIntro(false);
   }
@@ -81,61 +83,53 @@ function App() {
       {/* ── Always visible: phase / mode / hint ── */}
       <SurgicalStatusBar />
 
-      {/* ── HUD panels — hidden during surgery, revealed via ☰ Help ── */}
+      {/* ── HUD sidebars — hidden during surgery, revealed via ☰ Help ── */}
       {showHUD && (
         <>
-          <HUDLayout
-            topLeft={
-              <HUDPanel title="Kinematics">
-                <KinematicsPanel />
-              </HUDPanel>
-            }
-            topRight={
-              <div className="mr-28 space-y-2">
+          {/* LEFT — setup & instrument selection, least-to-most frequently changed */}
+          <HUDSidebar side="left" topOffset="top-4">
+            <HUDPanel title="Mode & Eye" accent="blue">
+              <div className="space-y-2">
                 <ModePanel />
-                <HUDPanel title="Operative Eye">
-                  <OperativeFieldBadge />
-                </HUDPanel>
+                <OperativeFieldBadge />
               </div>
-            }
-            midLeft={
-              <>
-                <HUDPanel title="Procedure">
-                  <ProcedureMenu />
-                </HUDPanel>
-                <HUDPanel title="Instrument">
-                  <InstrumentPanel />
-                </HUDPanel>
-                <HUDPanel title="Microscope" defaultOpen={false}>
-                  <MicroscopePanel />
-                </HUDPanel>
-              </>
-            }
-            midRight={
-              <>
-                <HUDPanel title="Cataract Curriculum">
-                  <CurriculumPanel />
-                </HUDPanel>
-                <HUDPanel title="Score & AI Coach" defaultOpen={false}>
-                  <ScoreCoachPanel />
-                </HUDPanel>
-              </>
-            }
-            bottomRight={
-              <HUDPanel title="Controls" defaultOpen={true}>
-                <ControlPanel />
-              </HUDPanel>
-            }
-            bottomLeft={
-              <div className="mb-10">
-                <HUDPanel title="Minimap" defaultOpen={true}>
-                  <MiniMap />
-                </HUDPanel>
-              </div>
-            }
-          />
-          <RCMPointList />
-          <RealTimeChart />
+            </HUDPanel>
+            <HUDPanel title="Procedure" accent="blue">
+              <ProcedureMenu />
+            </HUDPanel>
+            <HUDPanel title="Instrument" accent="green">
+              <InstrumentPanel />
+            </HUDPanel>
+            <HUDPanel title="Microscope" accent="blue" defaultOpen={false}>
+              <MicroscopePanel />
+            </HUDPanel>
+            <HUDPanel title="Kinematics" accent="amber" defaultOpen={false}>
+              <KinematicsPanel />
+            </HUDPanel>
+            <HUDPanel title="Minimap" accent="blue" defaultOpen={false}>
+              <MiniMap />
+            </HUDPanel>
+          </HUDSidebar>
+
+          {/* RIGHT — curriculum is primary and always open; everything else
+              supports it and stacks below in normal flow (no overlap possible) */}
+          <HUDSidebar side="right" topOffset="top-16">
+            <HUDPanel title="Cataract Curriculum" accent="purple" defaultOpen={true}>
+              <CurriculumPanel />
+            </HUDPanel>
+            <HUDPanel title="Depth Chart" accent="blue" defaultOpen={true}>
+              <RealTimeChart />
+            </HUDPanel>
+            <HUDPanel title="Controls" accent="blue" defaultOpen={false}>
+              <ControlPanel />
+            </HUDPanel>
+            <HUDPanel title="RCM Points" accent="green" defaultOpen={false}>
+              <RCMPointList />
+            </HUDPanel>
+            <HUDPanel title="Score & AI Coach" accent="amber" defaultOpen={false}>
+              <ScoreCoachPanel />
+            </HUDPanel>
+          </HUDSidebar>
         </>
       )}
 
