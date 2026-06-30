@@ -16,6 +16,7 @@ import { createCurriculumSlice } from './curriculumSlice';
 import { createScoringAISlice } from './scoringAISlice';
 import { createReplayAnalyticsSlice } from './replayAnalyticsSlice';
 import { createProcedureSlice } from './procedureSlice';
+import { createUISlice } from './uiSlice';
 import type { RCMSlice } from './rcmSlice';
 import type { NeedleSlice } from './needleSlice';
 import type { TrajectorySlice } from './trajectorySlice';
@@ -28,12 +29,13 @@ import type { CurriculumSlice } from './curriculumSlice';
 import type { ScoringAISlice } from './scoringAISlice';
 import type { ReplayAnalyticsSlice } from './replayAnalyticsSlice';
 import type { ProcedureSlice } from './procedureSlice';
+import type { UISlice } from './uiSlice';
 
 // Re-export for consumers
 export type { RCMPoint } from './rcmSlice';
 
 /** Full composed store type */
-export type SimulationState = RCMSlice & NeedleSlice & TrajectorySlice & HistorySlice & MicroscopeSlice & InstrumentSlice & PhysicsSlice & FluidSlice & CurriculumSlice & ScoringAISlice & ReplayAnalyticsSlice & ProcedureSlice & {
+export type SimulationState = RCMSlice & NeedleSlice & TrajectorySlice & HistorySlice & MicroscopeSlice & InstrumentSlice & PhysicsSlice & FluidSlice & CurriculumSlice & ScoringAISlice & ReplayAnalyticsSlice & ProcedureSlice & UISlice & {
   getNeedlePose: () => NeedlePose | null;
 };
 
@@ -64,6 +66,7 @@ export const useSimulationStore = create<SimulationState>()((set, get, api) => (
   ...createScoringAISlice(set, get, api),
   ...createReplayAnalyticsSlice(set, get, api),
   ...createProcedureSlice(set, get, api),
+  ...createUISlice(set, get, api),
 
   getNeedlePose: () => {
     const state = get();
