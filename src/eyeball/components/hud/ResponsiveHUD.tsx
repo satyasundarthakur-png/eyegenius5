@@ -2,34 +2,44 @@ import { useState, type ReactNode } from 'react';
 import { useBreakpoint } from '../../hooks/useBreakpoint';
 
 /**
- * HUDPanel — collapsible wrapper on mobile, transparent passthrough on desktop.
+ * HUDPanel — collapsible section card.
+ * Desktop/tablet: always a collapsible accordion (consistent everywhere,
+ * not just mobile) so a long sidebar stays manageable — low-priority
+ * panels (Microscope, Score & Coach) default closed.
  */
 export function HUDPanel({
   children,
   title,
   defaultOpen = true,
+  accent = 'blue',
 }: {
   children: ReactNode;
   title: string;
   defaultOpen?: boolean;
+  accent?: 'blue' | 'green' | 'amber' | 'purple';
 }) {
-  const bp = useBreakpoint();
   const [isOpen, setIsOpen] = useState(defaultOpen);
-  const isMobile = bp === 'sm';
 
-  if (!isMobile) return <>{children}</>;
+  const accentText = {
+    blue: 'text-blue-400', green: 'text-green-400',
+    amber: 'text-amber-400', purple: 'text-purple-400',
+  }[accent];
 
   return (
-    <div className="pointer-events-auto">
+    <div className="pointer-events-auto overflow-hidden rounded-lg border border-blue-500/25 bg-gray-950/90 backdrop-blur">
       <button
-        onClick={() => { setIsOpen(!isOpen); }}
-        className="flex w-full items-center justify-between rounded-t-lg border border-blue-500/30 bg-gray-950/90 px-3 py-2 text-xs font-semibold tracking-wider text-blue-400 uppercase backdrop-blur"
+        onClick={() => { setIsOpen((v) => !v); }}
+        className="flex w-full items-center justify-between px-3 py-2 text-left transition-colors hover:bg-blue-500/5"
       >
-        <span>{title}</span>
-        <span className="text-blue-300/60">{isOpen ? '▾' : '▸'}</span>
+        <span className={`text-xs font-semibold tracking-wider uppercase ${accentText}`}>
+          {title}
+        </span>
+        <span className="text-blue-300/40 transition-transform" style={{ transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)' }}>
+          ▾
+        </span>
       </button>
       {isOpen && (
-        <div className="border-x border-b border-blue-500/30 bg-gray-950/90 backdrop-blur">
+        <div className="border-t border-blue-500/15 px-3 py-3">
           {children}
         </div>
       )}
@@ -38,84 +48,77 @@ export function HUDPanel({
 }
 
 /**
- * HUDLayout — responsive 6-zone layout.
+ * HUDSidebar — single continuous scrollable column, fixed to one screen edge.
  *
- * Desktop / Tablet: CSS grid with rows [auto · 1fr · auto].
- *   - Top row    shrinks to content height.
- *   - Mid row    fills ALL remaining viewport height; each column is
- *                independently overflow-y-auto so panels never clip.
- *   - Bottom row shrinks to content height, pinned to viewport bottom.
+ * Replaces the old 3-row grid. Panels stack in normal document flow —
+ * structurally impossible for two panels to overlap, since each one
+ * simply pushes the next one down. The whole column scrolls as one unit
+ * once content exceeds the viewport.
  *
- * Mobile: stacked bottom drawer (unchanged).
+ * `topOffset` reserves space below the floating ☰ Help button (right side)
+ * or the top edge (left side) so the sidebar never starts under it.
  */
-export function HUDLayout({
-  topLeft,
-  topRight,
-  midLeft,
-  midRight,
-  bottomRight,
-  bottomLeft,
+export function HUDSidebar({
+  side,
+  children,
+  topOffset = 'top-16',
 }: {
-  topLeft?: ReactNode;
-  topRight?: ReactNode;
-  midLeft?: ReactNode;
-  midRight?: ReactNode;
-  bottomRight?: ReactNode;
-  bottomLeft?: ReactNode;
+  side: 'left' | 'right';
+  children: ReactNode;
+  topOffset?: string;
 }) {
   const bp = useBreakpoint();
   const isMobile = bp === 'sm';
 
   if (isMobile) {
+    // Mobile: single bottom drawer, both sides merge into one stack.
+    // (Two separate <HUDSidebar> calls each render their own drawer
+    // section; App.tsx stacks left then right for a natural reading order.)
     return (
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-2 p-2">
-        {midLeft}
-        {midRight}
-        {bottomLeft}
-        {bottomRight}
+      <div className="pointer-events-none w-full px-2 pb-2">
+        <div className="pointer-events-auto flex flex-col gap-2">
+          {children}
+        </div>
       </div>
     );
   }
 
-  /* Tablet + Desktop share the same grid structure; only padding differs */
-  const pad = bp === 'md' ? 'p-3' : 'p-4';
-  const colW = bp === 'md' ? 'max-w-[45%]' : 'w-64 shrink-0';
+  const widthClass = bp === 'md' ? 'w-60' : 'w-72';
+  const sideClass  = side === 'left' ? 'left-4' : 'right-4';
 
   return (
     <div
-      className={`pointer-events-none absolute inset-0 grid grid-rows-[auto_1fr_auto] ${pad} gap-y-2`}
+      className={`pointer-events-none fixed ${topOffset} bottom-4 ${sideClass} z-30 ${widthClass}`}
     >
-      {/* ── Row 1: top ── */}
-      <div className="flex items-start justify-between gap-4">
-        {topLeft  && <div className={`pointer-events-auto ${colW}`}>{topLeft}</div>}
-        {topRight && <div className={`pointer-events-auto ${colW}`}>{topRight}</div>}
-      </div>
-
-      {/* ── Row 2: mid — fills remaining height, hidden-scrollbar columns ── */}
-      <div className="flex min-h-0 items-start justify-between gap-4">
-        {midLeft && (
-          <div
-            className={`pointer-events-auto ${colW} space-y-2 overflow-y-auto`}
-            style={{ scrollbarWidth: 'none' }}
-          >
-            {midLeft}
-          </div>
-        )}
-        {midRight && (
-          <div
-            className={`pointer-events-auto ${colW} space-y-2 overflow-y-auto`}
-            style={{ scrollbarWidth: 'none' }}
-          >
-            {midRight}
-          </div>
-        )}
-      </div>
-
-      {/* ── Row 3: bottom ── */}
-      <div className="flex items-end justify-between gap-4">
-        {bottomLeft  && <div className={`pointer-events-auto ${colW}`}>{bottomLeft}</div>}
-        {bottomRight && <div className={`pointer-events-auto ${colW}`}>{bottomRight}</div>}
+      <div
+        className="pointer-events-auto flex h-full flex-col gap-2.5 overflow-y-auto pr-1"
+        style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(59,130,246,0.3) transparent' }}
+      >
+        {children}
       </div>
     </div>
+  );
+}
+
+/**
+ * HUDLayout — thin compatibility wrapper kept for any remaining callers.
+ * New code should use <HUDSidebar side="left|right"> directly (see App.tsx).
+ */
+export function HUDLayout({
+  topLeft, topRight, midLeft, midRight, bottomRight, bottomLeft,
+}: {
+  topLeft?: ReactNode; topRight?: ReactNode;
+  midLeft?: ReactNode; midRight?: ReactNode;
+  bottomRight?: ReactNode; bottomLeft?: ReactNode;
+}) {
+  return (
+    <>
+      <HUDSidebar side="left">
+        {topLeft}{midLeft}{bottomLeft}
+      </HUDSidebar>
+      <HUDSidebar side="right">
+        {topRight}{midRight}{bottomRight}
+      </HUDSidebar>
+    </>
   );
 }
