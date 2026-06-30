@@ -1,5 +1,6 @@
 import { useSimulationStore } from '../../stores/simulationStore';
 import type { SimulationMode } from '../../types';
+import { MODE_DISPLAY } from '../../constants/terminology';
 
 interface ModeConfig {
   mode: SimulationMode;
@@ -13,7 +14,7 @@ interface ModeConfig {
 const MODES: ModeConfig[] = [
   {
     mode: 'VIEW',
-    label: 'View',
+    label: MODE_DISPLAY.VIEW,
     shortcut: 'V',
     activeBg: 'bg-blue-600',
     activeBorder: 'border-blue-400',
@@ -21,7 +22,7 @@ const MODES: ModeConfig[] = [
   },
   {
     mode: 'PLACE',
-    label: 'Place',
+    label: MODE_DISPLAY.PLACE,
     shortcut: 'P',
     activeBg: 'bg-green-600',
     activeBorder: 'border-green-400',
@@ -29,7 +30,7 @@ const MODES: ModeConfig[] = [
   },
   {
     mode: 'EDIT',
-    label: 'Edit',
+    label: MODE_DISPLAY.EDIT,
     shortcut: 'E',
     activeBg: 'bg-amber-600',
     activeBorder: 'border-amber-400',
@@ -37,7 +38,7 @@ const MODES: ModeConfig[] = [
   },
   {
     mode: 'REPLAY',
-    label: 'Replay',
+    label: MODE_DISPLAY.REPLAY,
     shortcut: 'R',
     activeBg: 'bg-purple-600',
     activeBorder: 'border-purple-400',
