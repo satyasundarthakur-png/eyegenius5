@@ -9,6 +9,11 @@ import { eyeAnatomy } from '../../../../packages/anatomy-engine/src/EyeAnatomy';
  * - Lens Capsule (very thin outer membrane)
  * - Lens Cortex
  * - Lens Nucleus (denser central core)
+ * - CapsularReflex — the bright, glistening specular highlight that a real
+ *   anterior lens capsule shows under coaxial microscope light. Without this,
+ *   the capsule's 0.55-opacity transmissive shell blends into the cortex
+ *   behind it and effectively disappears from the operative view, which is
+ *   what made the lens look "capsule-less" through the dilated pupil.
  *
  * Positioned inside the anterior chamber, behind the iris.
  * Uses data from the anatomy-engine for future consistency with deformation & cutting.
@@ -42,6 +47,18 @@ export function Lens() {
     return g;
   }, [nucleusData]);
 
+  // Capsular reflex — a thin bright ring just inside the capsule's anterior
+  // equator, simulating the glistening specular highlight a real anterior
+  // lens capsule shows under coaxial light. This is what makes a capsule
+  // visually register as "a capsule" rather than disappearing into the
+  // cortex behind it. Radius matches the capsule's approximate equatorial
+  // extent (capsule fallback sphere radius 5.0, scaled 0.6 on z — at the
+  // anterior-most point the cross-section radius is close to the full 5.0).
+  const reflexGeometry = useMemo(() => {
+    const geo = new THREE.TorusGeometry(4.3, 0.12, 10, 64);
+    return geo;
+  }, []);
+
   return (
     <group position={[0, 0, 4.5]}> {/* Positioned behind iris, inside anterior chamber */}
       {/* Lens Capsule - thin transparent outer layer */}
@@ -49,13 +66,26 @@ export function Lens() {
         <meshPhysicalMaterial
           color="#f0f8ff"
           transparent
-          opacity={0.55}
-          roughness={0.1}
-          metalness={0.15}
-          clearcoat={0.9}
-          clearcoatRoughness={0.08}
-          transmission={0.6}
+          opacity={0.6}
+          roughness={0.08}
+          metalness={0.18}
+          clearcoat={1.0}
+          clearcoatRoughness={0.05}
+          transmission={0.55}
           thickness={0.3}
+        />
+      </mesh>
+
+      {/* Capsular reflex — glistening anterior-capsule highlight ring, always
+          visible (unlike CapsulorhexisGuide, which only appears during the
+          rhexis curriculum step and uses a distinct warm-yellow pulsing color
+          to mark the target zone rather than the capsule's natural sheen). */}
+      <mesh geometry={reflexGeometry} position={[0, 0, 0.95]}>
+        <meshBasicMaterial
+          color="#ffffff"
+          transparent
+          opacity={0.35}
+          toneMapped={false}
         />
       </mesh>
 

@@ -26,96 +26,147 @@ function createIrisRng(seed: number) {
  * - y-axis (v): radial direction, inner pupil edge (top) to outer limbus edge (bottom)
  */
 function createIrisTexture(): THREE.CanvasTexture {
-  const width = 512;
-  const height = 256;
+  const width = 1024;
+  const height = 384;
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return new THREE.CanvasTexture(canvas);
+  const rawCtx = canvas.getContext('2d');
+  if (!rawCtx) return new THREE.CanvasTexture(canvas);
+  const ctx: CanvasRenderingContext2D = rawCtx;
 
   const rng = createIrisRng(123);
 
   const rgba = (r: number, g: number, b: number, a: number) =>
     'rgba(' + r.toFixed(0) + ', ' + g.toFixed(0) + ', ' + b.toFixed(0) + ', ' + a.toFixed(3) + ')';
 
-  // Base color gradient: darker near pupil (top), lighter near limbus (bottom)
-  // Inner edge: deep blue (#1a3870), outer edge: lighter blue (#5a98d0)
+  // ── Base color: warm hazel-blue, with sectoral heterochromia patches ──────
+  // Real irises are rarely a flat single hue — even predominantly blue eyes
+  // commonly show warm amber/brown sectoral flecks radiating from the
+  // collarette, especially near the pupil. v=0 (top) = pupil edge, v=1
+  // (bottom) = limbus edge.
   for (let y = 0; y < height; y++) {
-    const t = y / height; // 0 = inner (pupil edge), 1 = outer (limbus edge)
-    const r = 26 + t * 64;
-    const g = 56 + t * 96;
-    const b = 112 + t * 96;
+    const t = y / height;
+    const r = 34 + t * 70;
+    const g = 64 + t * 100;
+    const b = 118 + t * 92;
     ctx.fillStyle = rgba(r, g, b, 1);
     ctx.fillRect(0, y, width, 1);
   }
 
-  // Draw radial fibers (collarette pattern)
-  // Fibers run from inner edge toward outer edge (top to bottom in texture space)
-  const fiberCount = 128;
+  // Sectoral amber/brown heterochromia flecks — 3–5 wedge-shaped warm patches
+  // radiating from near the pupil margin outward, common in real (even blue)
+  // irises and one of the biggest cues that breaks the "flat CG disc" look.
+  const sectorCount = 3 + Math.floor(rng() * 3);
+  for (let s = 0; s < sectorCount; s++) {
+    const angleU = rng() * width;
+    const sectorWidth = width * (0.05 + rng() * 0.08);
+    const grad = ctx.createLinearGradient(0, 0, 0, height * 0.7);
+    grad.addColorStop(0, rgba(150, 100, 50, 0.0));
+    grad.addColorStop(0.25, rgba(160, 110, 55, 0.35 + rng() * 0.2));
+    grad.addColorStop(0.6, rgba(140, 95, 50, 0.12));
+    grad.addColorStop(1, rgba(140, 95, 50, 0));
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.ellipse(angleU, height * 0.18, sectorWidth, height * 0.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // ── Pupillary ruff — dark pigment frill right at the pupil margin ─────────
+  const ruffGrad = ctx.createLinearGradient(0, 0, 0, height * 0.06);
+  ruffGrad.addColorStop(0, rgba(10, 12, 22, 0.85));
+  ruffGrad.addColorStop(1, rgba(10, 12, 22, 0));
+  ctx.fillStyle = ruffGrad;
+  ctx.fillRect(0, 0, width, height * 0.06);
+
+  // ── Radial fibers (fine collagen trabeculae) ──────────────────────────────
+  const fiberCount = 260;
   for (let i = 0; i < fiberCount; i++) {
     const x = (i / fiberCount) * width + (rng() - 0.5) * 4;
-    const fiberWidth = 1 + rng() * 3;
-    const fiberLength = height * (0.5 + rng() * 0.5);
-    const startY = rng() * height * 0.15; // start near inner edge
+    const fiberWidth = 0.6 + rng() * 2.2;
+    const fiberLength = height * (0.45 + rng() * 0.5);
+    const startY = height * 0.05 + rng() * height * 0.08;
 
-    // Fiber color: slightly lighter or darker than base
-    const brightness = 0.7 + rng() * 0.6;
-    const fr = (40 + rng() * 50) * brightness;
-    const fg = (80 + rng() * 60) * brightness;
-    const fb = (140 + rng() * 60) * brightness;
-    const fAlpha = 0.15 + rng() * 0.25;
+    const brightness = 0.6 + rng() * 0.7;
+    const fr = (45 + rng() * 55) * brightness;
+    const fg = (85 + rng() * 65) * brightness;
+    const fb = (145 + rng() * 65) * brightness;
+    const fAlpha = 0.12 + rng() * 0.28;
 
     ctx.beginPath();
     ctx.moveTo(x, startY);
-
-    // Slight angular wander as fiber extends outward
     let cx = x;
-    for (let step = 0; step < fiberLength; step += 2) {
-      cx += (rng() - 0.5) * 0.8;
+    for (let step = 0; step < fiberLength; step += 3) {
+      cx += (rng() - 0.5) * 1.1;
       ctx.lineTo(cx, startY + step);
     }
-
     ctx.strokeStyle = rgba(fr, fg, fb, fAlpha);
     ctx.lineWidth = fiberWidth;
     ctx.lineCap = 'round';
     ctx.stroke();
   }
 
-  // Add collarette ring — a brighter band at ~40% from inner edge
-  const collaretteY = height * 0.4;
-  const collaretteHeight = height * 0.12;
-  const collaretteGrad = ctx.createLinearGradient(0, collaretteY - collaretteHeight, 0, collaretteY + collaretteHeight);
-  collaretteGrad.addColorStop(0, rgba(60, 100, 160, 0));
-  collaretteGrad.addColorStop(0.3, rgba(80, 130, 190, 0.2));
-  collaretteGrad.addColorStop(0.5, rgba(100, 150, 210, 0.3));
-  collaretteGrad.addColorStop(0.7, rgba(80, 130, 190, 0.2));
-  collaretteGrad.addColorStop(1, rgba(60, 100, 160, 0));
-  ctx.fillStyle = collaretteGrad;
-  ctx.fillRect(0, collaretteY - collaretteHeight, width, collaretteHeight * 2);
+  // ── Collarette — a jagged/wavy ridge ~35–45% out from the pupil, NOT a
+  // smooth gradient band. Drawn as a wandering zigzag line with per-angle
+  // noise, which is what actually reads as "collarette" rather than a stripe. ──
+  const collaretteBaseY = height * 0.4;
+  const collaretteAmplitude = height * 0.045;
+  ctx.beginPath();
+  for (let x = 0; x <= width; x += 4) {
+    const wobble = (Math.sin(x * 0.045) + Math.sin(x * 0.11 + 3) * 0.5) * collaretteAmplitude;
+    const y = collaretteBaseY + wobble + (rng() - 0.5) * 3;
+    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = rgba(110, 150, 200, 0.28);
+  ctx.lineWidth = 5;
+  ctx.stroke();
+  // Brighter highlight just outside the jagged line (ciliary-zone side)
+  ctx.beginPath();
+  for (let x = 0; x <= width; x += 4) {
+    const wobble = (Math.sin(x * 0.045) + Math.sin(x * 0.11 + 3) * 0.5) * collaretteAmplitude;
+    const y = collaretteBaseY + wobble + height * 0.025;
+    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.strokeStyle = rgba(150, 185, 225, 0.18);
+  ctx.lineWidth = 8;
+  ctx.stroke();
 
-  // Add crypts (dark spots between fibers)
-  const cryptCount = 40;
+  // ── Contraction furrows — faint concentric arcs in the outer (ciliary) zone ──
+  const furrowCount = 5;
+  for (let i = 0; i < furrowCount; i++) {
+    const y = height * (0.55 + (i / furrowCount) * 0.4) + (rng() - 0.5) * 6;
+    ctx.beginPath();
+    for (let x = 0; x <= width; x += 6) {
+      const wobble = Math.sin(x * 0.02 + i) * 3 + (rng() - 0.5) * 2;
+      if (x === 0) ctx.moveTo(x, y + wobble); else ctx.lineTo(x, y + wobble);
+    }
+    ctx.strokeStyle = rgba(20, 35, 65, 0.08 + rng() * 0.06);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // ── Crypts — irregular dark patches, denser in the ciliary zone ──────────
+  const cryptCount = 70;
   for (let i = 0; i < cryptCount; i++) {
     const cx = rng() * width;
-    const cy = height * 0.15 + rng() * height * 0.6;
-    const cr = 2 + rng() * 5;
+    const cy = height * 0.18 + rng() * height * 0.7;
+    const cr = 1.5 + rng() * 6;
 
     const cryptGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
-    cryptGrad.addColorStop(0, rgba(15, 25, 50, 0.4));
-    cryptGrad.addColorStop(0.6, rgba(20, 35, 65, 0.2));
-    cryptGrad.addColorStop(1, rgba(30, 50, 90, 0));
+    cryptGrad.addColorStop(0, rgba(12, 20, 42, 0.45));
+    cryptGrad.addColorStop(0.6, rgba(18, 30, 58, 0.2));
+    cryptGrad.addColorStop(1, rgba(28, 45, 85, 0));
     ctx.fillStyle = cryptGrad;
     ctx.fillRect(cx - cr, cy - cr, cr * 2, cr * 2);
   }
 
-  // Add fine radial striations for detail
-  for (let i = 0; i < 200; i++) {
+  // ── Fine stippled noise across the whole surface (breaks up flatness) ────
+  for (let i = 0; i < 600; i++) {
     const x = rng() * width;
-    const y = rng() * height;
-    const len = 3 + rng() * 8;
-    ctx.strokeStyle = rgba(30 + rng() * 40, 60 + rng() * 40, 120 + rng() * 40, 0.08 + rng() * 0.1);
-    ctx.lineWidth = 0.5 + rng() * 0.5;
+    const y = height * 0.05 + rng() * height * 0.9;
+    const len = 2 + rng() * 7;
+    ctx.strokeStyle = rgba(30 + rng() * 50, 60 + rng() * 50, 120 + rng() * 50, 0.06 + rng() * 0.1);
+    ctx.lineWidth = 0.4 + rng() * 0.5;
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(x + (rng() - 0.5) * 2, y + len);
@@ -125,6 +176,7 @@ function createIrisTexture(): THREE.CanvasTexture {
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.ClampToEdgeWrapping;
+  texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
 }
 
@@ -187,6 +239,63 @@ export function Cornea() {
 }
 
 /**
+ * CorneaCatchlight — the bright specular reflection of the coaxial microscope
+ * light on the corneal surface (a "Purkinje image"). Every real macro/surgical
+ * eye photo shows this; without it, a perfectly diffuse, shadowless cornea is
+ * one of the strongest cues that breaks the "real eye" illusion and makes the
+ * globe read as a flat painted ball instead of a wet, curved, reflective surface.
+ *
+ * Modeled as a small soft radial-gradient sprite positioned on the corneal
+ * surface using the actual spherical-cap geometry (offset superior-nasally,
+ * the conventional position for an overhead coaxial light source).
+ */
+function createCatchlightTexture(): THREE.CanvasTexture {
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return new THREE.CanvasTexture(canvas);
+
+  const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+  grad.addColorStop(0.35, 'rgba(255, 255, 255, 0.55)');
+  grad.addColorStop(0.7, 'rgba(255, 255, 255, 0.12)');
+  grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+export function CorneaCatchlight() {
+  const texture = useMemo(() => createCatchlightTexture(), []);
+
+  // Superior-nasal offset from the corneal apex — the conventional position
+  // for an overhead coaxial microscope light's reflection.
+  const offsetX = -1.6;
+  const offsetY = 1.9;
+  const r = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+  const z = CORNEA_CENTER_Z + Math.sqrt(
+    Math.max(0, CORNEA_RADIUS_CURVATURE * CORNEA_RADIUS_CURVATURE - r * r)
+  ) + 0.05; // tiny epsilon forward so it never z-fights the cornea surface
+
+  return (
+    <mesh position={[offsetX, offsetY, z]}>
+      <planeGeometry args={[2.6, 2.6]} />
+      <meshBasicMaterial
+        map={texture}
+        transparent
+        depthWrite={false}
+        toneMapped={false}
+      />
+    </mesh>
+  );
+}
+
+/**
  * Iris: the colored ring at the front of the eye, just behind the cornea surface.
  * Positioned at z = 11.5 (inside the eyeball), facing +Z.
  *
@@ -199,23 +308,24 @@ export function Iris() {
 
   const pupilMeshRef = useRef<THREE.Mesh>(null);
   const pupilMatRef  = useRef<THREE.MeshPhysicalMaterial>(null);
-  const procedureStarted = useSimulationStore((s) => s.procedureStarted);
   const dilationRef = useRef(0); // 0 = natural resting pupil, 1 = fully mydriatic (dilated)
 
   const irisTexture = useMemo(() => createIrisTexture(), []);
 
   // Pupil dilation simulates pre-op mydriatic drops (tropicamide/phenylephrine),
-  // NOT needle insertion depth — a real surgical pupil is already maximally
-  // dilated before the surgeon ever touches the eye. Animates open quickly
-  // once the procedure starts; red-reflex glow still tracks microscope light.
+  // Pupil dilation simulates pre-op mydriatic drops (tropicamide/phenylephrine).
+  // The eye is shown draped and speculum-fixed — by that point in a real case
+  // mydriasis is already complete, so the pupil animates open once on mount
+  // rather than waiting on curriculum/procedure state. Red-reflex glow still
+  // tracks microscope light independently.
   useFrame((_, delta) => {
     if (!pupilMeshRef.current) return;
 
-    const target = procedureStarted ? 1 : 0;
+    const target = 1; // always fully dilated — eye is already prepped/draped
     // Fast ease (~0.4s time constant) — mimics drops having already taken effect
     dilationRef.current += (target - dilationRef.current) * Math.min(1, delta * 6);
 
-    const restingRatio  = 0.42; // natural undilated pupil, pre-medication
+    const restingRatio  = 0.42; // natural undilated pupil, pre-medication (animation start point only)
     const dilatedRatio  = 0.80; // fully dilated surgical working diameter
     const ratio = restingRatio + (dilatedRatio - restingRatio) * dilationRef.current;
     pupilMeshRef.current.scale.set(ratio / restingRatio, ratio / restingRatio, 1);
@@ -236,17 +346,17 @@ export function Iris() {
         <meshPhysicalMaterial
           map={irisTexture}
           emissive={COLORS.iris}
-          emissiveIntensity={0.08}
+          emissiveIntensity={0.02}
           side={THREE.DoubleSide}
-          roughness={0.35}
-          metalness={0.05}
-          transmission={0.15}
+          roughness={0.4}
+          metalness={0.03}
+          transmission={0.1}
           thickness={0.6}
           attenuationColor={new THREE.Color('#3a70b0')}
           attenuationDistance={2.0}
-          clearcoat={0.3}
-          clearcoatRoughness={0.2}
-          envMapIntensity={0.6}
+          clearcoat={0.25}
+          clearcoatRoughness={0.25}
+          envMapIntensity={0.5}
           depthTest={false}
           depthWrite={false}
         />
