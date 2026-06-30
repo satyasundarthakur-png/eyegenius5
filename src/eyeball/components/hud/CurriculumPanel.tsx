@@ -108,7 +108,7 @@ export function CurriculumPanel() {
         </p>
         <p className="mb-3 text-xs text-blue-300/50 leading-snug">
           First: press <kbd className="rounded border border-blue-500/30 bg-blue-500/15 px-1 font-mono text-[10px]">P</kbd>,
-          click the eyeball to place the RCM entry point, then start.
+          click the eyeball to mark the entry point, then start.
         </p>
         <button
           onClick={startProcedure}
