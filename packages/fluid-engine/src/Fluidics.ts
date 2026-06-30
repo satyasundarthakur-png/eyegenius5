@@ -34,15 +34,18 @@ export class Fluidics {
 
   private createInitialState(): FluidicsState {
     return {
-      chamberPressure: this.config.targetPressure,
-      chamberVolume: 1.0,
+      // Anterior chamber starts collapsed (pressure 8 mmHg, well below the
+      // 18 mmHg target). The surgeon must run irrigation to raise pressure
+      // to a stable working level before hydro/phaco/cortex steps validate.
+      chamberPressure: 8,
+      chamberVolume: 0.6,
       irrigationFlow: 0,
       aspirationFlow: 0,
       vacuumLevel: 0,
       viscoelasticVolume: 0,
       leakageRate: this.config.woundLeakage,
-      stability: 0.5,   // starts borderline — instrument use is required to stabilise
-      isStable: false, // will become true once irrigation is running
+      stability: 0.2,   // low — only rises with active irrigation
+      isStable: false,  // unlocked only once stability > 0.65
     };
   }
 
