@@ -41,8 +41,8 @@ export class Fluidics {
       vacuumLevel: 0,
       viscoelasticVolume: 0,
       leakageRate: this.config.woundLeakage,
-      stability: 0.95,
-      isStable: true,
+      stability: 0.5,   // starts borderline — instrument use is required to stabilise
+      isStable: false, // will become true once irrigation is running
     };
   }
 
@@ -70,7 +70,7 @@ export class Fluidics {
     let pressureChange = -this.config.woundLeakage * 12 * dt;
 
     // Irrigation effect (when I/A or phaco is active)
-    if (instrumentActive && (instrumentType === 'irrigation_aspiration' || instrumentType === 'phaco_tip')) {
+    if (instrumentActive && (instrumentType === 'irrigation_aspiration' || instrumentType === 'phaco_tip' || instrumentType === 'hydrodissection_cannula')) {
       const irrigation = 45 * this.config.irrigationEfficiency; // ml/min
       this.state.irrigationFlow = irrigation;
       pressureChange += (irrigation / 60) * 0.8 * dt;
