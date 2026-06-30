@@ -15,30 +15,40 @@ import { ScoreCoachPanel } from './components/hud/ScoreCoachPanel';
 import { ProcedureMenu } from './components/hud/ProcedureMenu';
 import { OperativeFieldBadge } from './components/hud/OperativeFieldBadge';
 import { SurgicalStatusBar } from './components/hud/SurgicalStatusBar';
+import { OnboardingOverlay, hasSeenOnboarding } from './components/OnboardingOverlay';
 import { HUDLayout, HUDPanel } from './components/hud/ResponsiveHUD';
 import { useThemeStore } from './stores/themeStore';
-import { useState as useOnboardState } from 'react';
-import { OnboardingOverlay, hasSeenOnboarding } from './components/OnboardingOverlay';
-import { StepGuide } from './components/hud/StepGuide';
+import { useSimulationStore } from './stores/simulationStore';
+import type { SurgicalProcedure } from './stores/procedureSlice';
 
 /**
  * App — OpenEyeSim root shell
  *
- * Surgery-first UI: clean 3-D operative field by default.
+ * On first load (or after clearing localStorage), a full-screen intro flow runs:
+ *   Screen 1 — Welcome splash + key-bindings cheat-sheet
+ *   Screen 2 — Surgery selector (Cataract · Vitreoretinal · Glaucoma · Corneal)
+ *   Screen 3 — Surgery-specific step-by-step walkthrough
+ * "Enter Simulation" on the last step auto-selects the chosen procedure and
+ * dismisses the overlay.
  *
- * Always visible (zero HUD clutter during surgery):
- *   • SurgicalStatusBar — bottom-left phase / mode pill + 1-line control hint
- *   • ☰ Help toggle — top-right corner
- *
- * Revealed only when surgeon presses ☰ Help:
- *   • KinematicsPanel, all side panels, RCMPointList, RealTimeChart
+ * During surgery the screen is clean (Canvas only). The ☰ Help button
+ * (top-right) toggles all HUD panels. SurgicalStatusBar (bottom-left)
+ * always shows phase + mode + a context hint.
  */
 function App() {
-  const theme = useThemeStore((s) => s.theme);
-  const [showHUD, setShowHUD] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useOnboardState(() => !hasSeenOnboarding());
+  const theme        = useThemeStore((s) => s.theme);
+  const setProcedure = useSimulationStore((s) => s.setProcedure);
+
+  const [showIntro, setShowIntro] = useState(() => !hasSeenOnboarding());
+  const [showHUD,   setShowHUD]   = useState(false);
 
   const bgColor = theme === 'dark' ? '#0a0a1a' : '#f5f5f0';
+
+  function handleIntroDismiss(selectedProcedure: SurgicalProcedure) {
+    // Auto-select the procedure the user chose during the intro walkthrough
+    setProcedure(selectedProcedure);
+    setShowIntro(false);
+  }
 
   return (
     <div
@@ -46,6 +56,11 @@ function App() {
         theme === 'dark' ? '' : 'bg-gray-100'
       }`}
     >
+      {/* ── Intro overlay (shown on first visit) ── */}
+      {showIntro && (
+        <OnboardingOverlay onDismiss={handleIntroDismiss} />
+      )}
+
       {/* ── 3-D Canvas: always full-screen ── */}
       <div className="absolute inset-0">
         <Canvas
@@ -63,10 +78,10 @@ function App() {
         </Canvas>
       </div>
 
-      {/* ── Always visible: phase / mode status + control hint ── */}
+      {/* ── Always visible: phase / mode / hint ── */}
       <SurgicalStatusBar />
 
-      {/* ── HUD panel stack: hidden during surgery ── */}
+      {/* ── HUD panels — hidden during surgery, revealed via ☰ Help ── */}
       {showHUD && (
         <>
           <HUDLayout
@@ -76,7 +91,6 @@ function App() {
               </HUDPanel>
             }
             topRight={
-              /* Leave room for the Help button at top-right */
               <div className="mr-28 space-y-2">
                 <ModePanel />
                 <HUDPanel title="Operative Eye">
@@ -113,7 +127,6 @@ function App() {
               </HUDPanel>
             }
             bottomLeft={
-              /* Status bar lives at bottom-left; give minimap a slight offset */
               <div className="mb-10">
                 <HUDPanel title="Minimap" defaultOpen={true}>
                   <MiniMap />
@@ -121,21 +134,12 @@ function App() {
               </div>
             }
           />
-          {/* RCMPointList is positioned absolute top-16 right-4 inside itself */}
           <RCMPointList />
           <RealTimeChart />
         </>
       )}
 
-      {/* ── Always visible: step instruction strip ── */}
-      <StepGuide />
-
-      {/* ── First-visit onboarding overlay ── */}
-      {showOnboarding && (
-        <OnboardingOverlay onDismiss={() => { setShowOnboarding(false); setShowHUD(true); }} />
-      )}
-
-      {/* ── Always visible: ☰ Help toggle ── */}
+      {/* ── ☰ Help toggle — always visible ── */}
       <button
         onClick={() => { setShowHUD((v) => !v); }}
         className={`
@@ -151,6 +155,17 @@ function App() {
       >
         {showHUD ? '✕ Close' : '☰ Help'}
       </button>
+
+      {/* ── Replay intro button (visible when HUD is closed) ── */}
+      {!showHUD && (
+        <button
+          onClick={() => { setShowIntro(true); }}
+          className="pointer-events-auto fixed right-4 top-14 z-50 rounded-lg border border-blue-500/20 bg-gray-950/70 px-3 py-1.5 text-[10px] text-blue-400/60 backdrop-blur hover:text-blue-300/80 transition-colors"
+          title="Replay intro / change procedure"
+        >
+          ? Intro
+        </button>
+      )}
     </div>
   );
 }
