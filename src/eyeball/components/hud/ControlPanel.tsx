@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useSimulationStore } from '../../stores/simulationStore';
+import { ENTRY_POINT_LABEL } from '../../constants/terminology';
 import { MAX_INSERTION_DEPTH, MAX_TILT_ANGLE } from '../../constants';
 import { exportTrailJSON, importTrailJSON, createScreenRecorder } from '../../lib/export';
 import { SettingsPanel } from './SettingsPanel';
@@ -158,7 +159,7 @@ export function ControlPanel() {
               </p>
             )}
             {mode === 'PLACE' && !rcmPoint && (
-              <p>Click on the eyeball surface to place the RCM point.</p>
+              <p>Click on the eyeball surface to mark the {ENTRY_POINT_LABEL.toLowerCase()}.</p>
             )}
           </div>
         )}
@@ -169,7 +170,7 @@ export function ControlPanel() {
             {/* Manual tilt controls */}
             <div className="mb-3">
               <label className="mb-1.5 block text-sm text-blue-100">
-                Tilt Alpha (elevation): {(tiltAlpha * (180 / Math.PI)).toFixed(1)}deg
+                Approach Angle (elevation): {(tiltAlpha * (180 / Math.PI)).toFixed(1)}deg
               </label>
               <Slider
                 min={0}
@@ -184,7 +185,7 @@ export function ControlPanel() {
 
             <div className="mb-3">
               <label className="mb-1.5 block text-sm text-blue-100">
-                Tilt Beta (azimuth): {(tiltBeta * (180 / Math.PI)).toFixed(1)}deg
+                Swing Angle (azimuth): {(tiltBeta * (180 / Math.PI)).toFixed(1)}deg
               </label>
               <Slider
                 min={-180}
