@@ -104,7 +104,7 @@ function App() {
             <HUDPanel title="Microscope" accent="blue" defaultOpen={false}>
               <MicroscopePanel />
             </HUDPanel>
-            <HUDPanel title="Kinematics" accent="amber" defaultOpen={false}>
+            <HUDPanel title="Instrument Telemetry" accent="amber" defaultOpen={false}>
               <KinematicsPanel />
             </HUDPanel>
             <HUDPanel title="Minimap" accent="blue" defaultOpen={false}>
@@ -124,7 +124,7 @@ function App() {
             <HUDPanel title="Controls" accent="blue" defaultOpen={false}>
               <ControlPanel />
             </HUDPanel>
-            <HUDPanel title="RCM Points" accent="green" defaultOpen={false}>
+            <HUDPanel title="Entry Points" accent="green" defaultOpen={false}>
               <RCMPointList />
             </HUDPanel>
             <HUDPanel title="Score & AI Coach" accent="amber" defaultOpen={false}>
