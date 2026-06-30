@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { ChevronRight, ChevronLeft, X } from 'lucide-react';
 
 const STORAGE_KEY = 'openeyesim-onboarded-v2';
@@ -476,7 +476,7 @@ export function OnboardingOverlay({ onDismiss }: Props) {
 
 // ─── Overlay shell ───────────────────────────────────────────────────────────
 
-function Overlay({ children }: { children: React.ReactNode }) {
+function Overlay({ children }: { children: ReactNode }) {
   return (
     <div className="pointer-events-auto fixed inset-0 z-[200] flex items-center justify-center overflow-y-auto bg-black/80 p-4 backdrop-blur-sm">
       <div className="w-full max-w-xl py-8">
