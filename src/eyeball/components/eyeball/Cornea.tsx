@@ -199,18 +199,26 @@ export function Iris() {
 
   const pupilMeshRef = useRef<THREE.Mesh>(null);
   const pupilMatRef  = useRef<THREE.MeshPhysicalMaterial>(null);
-  const insertionDepth = useSimulationStore((s) => s.insertionDepth);
+  const procedureStarted = useSimulationStore((s) => s.procedureStarted);
+  const dilationRef = useRef(0); // 0 = natural resting pupil, 1 = fully mydriatic (dilated)
 
   const irisTexture = useMemo(() => createIrisTexture(), []);
 
-  // Dilation + red-reflex emissive driven per frame
-  useFrame(() => {
+  // Pupil dilation simulates pre-op mydriatic drops (tropicamide/phenylephrine),
+  // NOT needle insertion depth — a real surgical pupil is already maximally
+  // dilated before the surgeon ever touches the eye. Animates open quickly
+  // once the procedure starts; red-reflex glow still tracks microscope light.
+  useFrame((_, delta) => {
     if (!pupilMeshRef.current) return;
-    const baseRatio = 0.35;
-    const maxRatio  = 0.80;
-    const maxDepth  = 18;
-    const ratio = baseRatio + (maxRatio - baseRatio) * Math.min(insertionDepth / maxDepth, 1);
-    pupilMeshRef.current.scale.set(ratio / baseRatio, ratio / baseRatio, 1);
+
+    const target = procedureStarted ? 1 : 0;
+    // Fast ease (~0.4s time constant) — mimics drops having already taken effect
+    dilationRef.current += (target - dilationRef.current) * Math.min(1, delta * 6);
+
+    const restingRatio  = 0.42; // natural undilated pupil, pre-medication
+    const dilatedRatio  = 0.80; // fully dilated surgical working diameter
+    const ratio = restingRatio + (dilatedRatio - restingRatio) * dilationRef.current;
+    pupilMeshRef.current.scale.set(ratio / restingRatio, ratio / restingRatio, 1);
 
     if (pupilMatRef.current) {
       const rrIntensity = microscope.getLightIntensities().redReflex;
