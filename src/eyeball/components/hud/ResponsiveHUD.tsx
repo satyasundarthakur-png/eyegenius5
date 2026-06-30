@@ -2,9 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { useBreakpoint } from '../../hooks/useBreakpoint';
 
 /**
- * HUDPanel: responsive wrapper for HUD panels.
- * - Desktop: renders children inline
- * - Mobile: renders as a collapsible bottom sheet
+ * HUDPanel — collapsible wrapper on mobile, transparent passthrough on desktop.
  */
 export function HUDPanel({
   children,
@@ -19,9 +17,7 @@ export function HUDPanel({
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const isMobile = bp === 'sm';
 
-  if (!isMobile) {
-    return <>{children}</>;
-  }
+  if (!isMobile) return <>{children}</>;
 
   return (
     <div className="pointer-events-auto">
@@ -42,9 +38,15 @@ export function HUDPanel({
 }
 
 /**
- * HUDLayout: responsive layout for HUD panels.
- * - Desktop: fixed corner positions + vertically-centered mid-left/mid-right stacks
- * - Mobile: stacked bottom drawer
+ * HUDLayout — responsive 6-zone layout.
+ *
+ * Desktop / Tablet: CSS grid with rows [auto · 1fr · auto].
+ *   - Top row    shrinks to content height.
+ *   - Mid row    fills ALL remaining viewport height; each column is
+ *                independently overflow-y-auto so panels never clip.
+ *   - Bottom row shrinks to content height, pinned to viewport bottom.
+ *
+ * Mobile: stacked bottom drawer (unchanged).
  */
 export function HUDLayout({
   topLeft,
@@ -63,7 +65,6 @@ export function HUDLayout({
 }) {
   const bp = useBreakpoint();
   const isMobile = bp === 'sm';
-  const isTablet = bp === 'md';
 
   if (isMobile) {
     return (
@@ -76,38 +77,44 @@ export function HUDLayout({
     );
   }
 
-  if (isTablet) {
-    return (
-      <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-3">
-        <div className="flex items-start justify-between gap-2">
-          <div className="max-w-[45%]">{topLeft}</div>
-          <div className="max-w-[45%]">{topRight}</div>
-        </div>
-        <div className="flex items-center justify-between gap-2">
-          <div className="max-w-[45%] space-y-2">{midLeft}</div>
-          <div className="max-w-[45%] space-y-2">{midRight}</div>
-        </div>
-        <div className="flex items-end justify-between gap-2">
-          <div className="max-w-[45%]">{bottomLeft}</div>
-          <div className="max-w-[45%]">{bottomRight}</div>
-        </div>
-      </div>
-    );
-  }
+  /* Tablet + Desktop share the same grid structure; only padding differs */
+  const pad = bp === 'md' ? 'p-3' : 'p-4';
+  const colW = bp === 'md' ? 'max-w-[45%]' : 'w-64 shrink-0';
 
   return (
-    <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-4">
-      <div className="flex items-start justify-between">
-        {topLeft}
-        {topRight}
+    <div
+      className={`pointer-events-none absolute inset-0 grid grid-rows-[auto_1fr_auto] ${pad} gap-y-2`}
+    >
+      {/* ── Row 1: top ── */}
+      <div className="flex items-start justify-between gap-4">
+        {topLeft  && <div className={`pointer-events-auto ${colW}`}>{topLeft}</div>}
+        {topRight && <div className={`pointer-events-auto ${colW}`}>{topRight}</div>}
       </div>
-      <div className="flex items-center justify-between">
-        <div className="space-y-2">{midLeft}</div>
-        <div className="space-y-2">{midRight}</div>
+
+      {/* ── Row 2: mid — fills remaining height, hidden-scrollbar columns ── */}
+      <div className="flex min-h-0 items-start justify-between gap-4">
+        {midLeft && (
+          <div
+            className={`pointer-events-auto ${colW} space-y-2 overflow-y-auto`}
+            style={{ scrollbarWidth: 'none' }}
+          >
+            {midLeft}
+          </div>
+        )}
+        {midRight && (
+          <div
+            className={`pointer-events-auto ${colW} space-y-2 overflow-y-auto`}
+            style={{ scrollbarWidth: 'none' }}
+          >
+            {midRight}
+          </div>
+        )}
       </div>
-      <div className="flex items-end justify-between">
-        {bottomLeft}
-        {bottomRight}
+
+      {/* ── Row 3: bottom ── */}
+      <div className="flex items-end justify-between gap-4">
+        {bottomLeft  && <div className={`pointer-events-auto ${colW}`}>{bottomLeft}</div>}
+        {bottomRight && <div className={`pointer-events-auto ${colW}`}>{bottomRight}</div>}
       </div>
     </div>
   );
