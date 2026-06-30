@@ -16,7 +16,7 @@ export interface CurriculumSlice {
   endProcedure: () => void;
 }
 
-export const createCurriculumSlice: StateCreator<SimulationState, [], [], CurriculumSlice> = (set) => ({
+export const createCurriculumSlice: StateCreator<SimulationState, [], [], CurriculumSlice> = (set, get) => ({
   currentCurriculumStep: cataractCurriculum.getCurrentStep(),
   curriculumValidation: null,
   complications: [],
