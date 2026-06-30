@@ -44,7 +44,7 @@ function App() {
 
   const [showIntro, setShowIntro] = useState(() => !hasSeenOnboarding());
   const showHUD     = useSimulationStore((s) => s.showHUD);
-  const setShowHUD  = useSimulationStore((s) => s.setShowHUD);
+  const toggleHUD   = useSimulationStore((s) => s.toggleHUD);
 
   const bgColor = theme === 'dark' ? '#0a0a1a' : '#f5f5f0';
 
@@ -136,7 +136,7 @@ function App() {
 
       {/* ── ☰ Help toggle — always visible ── */}
       <button
-        onClick={() => { setShowHUD((v) => !v); }}
+        onClick={() => { toggleHUD(); }}
         className={`
           pointer-events-auto fixed right-4 top-4 z-50
           flex items-center gap-1.5 rounded-lg border px-3 py-2

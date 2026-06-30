@@ -1,7 +1,7 @@
 import type { InstrumentConfig, InstrumentState, InstrumentPose, InstrumentType, TipGeometryDescriptor } from './types/instrument';
-import type { Vec3 } from '../../../src/types';
-import { computeNeedlePose, type RCMConfig } from '../../../src/lib/rcm';
-import { MAX_INSERTION_DEPTH, MAX_TILT_ANGLE } from '../../../src/constants';
+import type { Vec3 } from '../../../src/eyeball/types';
+import { computeNeedlePose, type RCMConfig } from '../../../src/eyeball/lib/rcm';
+import { MAX_INSERTION_DEPTH, MAX_TILT_ANGLE } from '../../../src/eyeball/constants';
 
 /**
  * Base class for all surgical instruments in OpenEyeSim AI.

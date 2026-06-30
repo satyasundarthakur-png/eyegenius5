@@ -1,4 +1,4 @@
-import type { Vec3 } from '../../../src/types';
+import type { Vec3 } from '../../../src/eyeball/types';
 import type { LayerId } from '../../anatomy-engine/types/anatomy';
 import type { CollisionResult, DeformationState, TearState, BiomechanicsConfig } from './types/physics';
 import { eyeAnatomy } from '../../anatomy-engine/src/EyeAnatomy';

@@ -1,5 +1,5 @@
 import type { ReplayEvent, EnhancedTrailPoint, ReplaySession } from './types/replay';
-import type { Vec3 } from '../../../src/types';
+import type { Vec3 } from '../../../src/eyeball/types';
 
 /**
  * OpenEyeSim AI — Enhanced Replay Engine (Step 9)

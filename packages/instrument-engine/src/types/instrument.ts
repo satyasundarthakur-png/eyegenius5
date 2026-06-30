@@ -1,4 +1,4 @@
-import type { Vec3 } from '../../../../src/types';
+import type { Vec3 } from '../../../../src/eyeball/types';
 
 /** Supported surgical instrument types in OpenEyeSim AI */
 export type InstrumentType =

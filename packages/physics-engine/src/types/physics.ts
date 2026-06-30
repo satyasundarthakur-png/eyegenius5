@@ -1,4 +1,4 @@
-import type { Vec3 } from '../../../../src/types';
+import type { Vec3 } from '../../../../src/eyeball/types';
 import type { LayerId } from '../../../../packages/anatomy-engine/types/anatomy';
 
 export interface CollisionResult {

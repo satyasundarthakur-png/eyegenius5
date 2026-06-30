@@ -1,1 +1,0 @@
-export { LimbusRing } from './Cornea';
