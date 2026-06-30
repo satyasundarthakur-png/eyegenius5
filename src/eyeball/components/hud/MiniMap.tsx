@@ -112,11 +112,11 @@ export function MiniMap() {
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // RCM point label
+      // Entry point label
       ctx.fillStyle = '#93c5fd';
       ctx.font = '10px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(`RCM${String(index + 1)}`, x, y - 10);
+      ctx.fillText(`E${String(index + 1)}`, x, y - 10);
     });
 
     // Draw trail points
@@ -193,7 +193,7 @@ export function MiniMap() {
       />
       <div className="mt-2 flex justify-between text-[10px] text-blue-300/60">
         <span>XY Projection</span>
-        <span>{rcmPoints.length} RCM</span>
+        <span>{rcmPoints.length} Entry{rcmPoints.length !== 1 ? '' : ''} Pt{rcmPoints.length !== 1 ? 's' : ''}</span>
       </div>
     </div>
   );
