@@ -173,6 +173,24 @@ function createIrisTexture(): THREE.CanvasTexture {
     ctx.stroke();
   }
 
+  // ── Soften the whole surface with a light blur pass ───────────────────────
+  // At extreme close zoom (full-screen macro view, as used in surgical
+  // close-ups) the crisp radial fiber lines drawn above can read as harsh
+  // banded "venetian blind" streaks rather than organic tissue texture.
+  // Compositing through a blurred offscreen pass keeps the underlying detail
+  // (collarette, crypts, heterochromia) while smoothing fiber edges.
+  const blurCanvas = document.createElement('canvas');
+  blurCanvas.width = width;
+  blurCanvas.height = height;
+  const blurCtx = blurCanvas.getContext('2d');
+  if (blurCtx) {
+    blurCtx.filter = 'blur(1.4px)';
+    blurCtx.drawImage(canvas, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+    ctx.filter = 'none';
+    ctx.drawImage(blurCanvas, 0, 0);
+  }
+
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.ClampToEdgeWrapping;
@@ -312,7 +330,6 @@ export function Iris() {
 
   const irisTexture = useMemo(() => createIrisTexture(), []);
 
-  // Pupil dilation simulates pre-op mydriatic drops (tropicamide/phenylephrine),
   // Pupil dilation simulates pre-op mydriatic drops (tropicamide/phenylephrine).
   // The eye is shown draped and speculum-fixed — by that point in a real case
   // mydriasis is already complete, so the pupil animates open once on mount
@@ -326,7 +343,7 @@ export function Iris() {
     dilationRef.current += (target - dilationRef.current) * Math.min(1, delta * 6);
 
     const restingRatio  = 0.42; // natural undilated pupil, pre-medication (animation start point only)
-    const dilatedRatio  = 0.80; // fully dilated surgical working diameter
+    const dilatedRatio  = 0.88; // fully dilated surgical working diameter (~7-8mm, typical surgical mydriasis)
     const ratio = restingRatio + (dilatedRatio - restingRatio) * dilationRef.current;
     pupilMeshRef.current.scale.set(ratio / restingRatio, ratio / restingRatio, 1);
 
@@ -342,7 +359,7 @@ export function Iris() {
   return (
     <>
       <mesh position={[0, 0, IRIS_Z]} rotation={[0, 0, 0]}>
-        <ringGeometry args={[IRIS_OUTER_RADIUS * 0.35, IRIS_OUTER_RADIUS, 64]} />
+        <ringGeometry args={[IRIS_OUTER_RADIUS * 0.35, IRIS_OUTER_RADIUS, 128]} />
         <meshPhysicalMaterial
           map={irisTexture}
           emissive={COLORS.iris}
