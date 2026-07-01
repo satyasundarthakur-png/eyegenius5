@@ -320,46 +320,58 @@ export function CorneaCatchlight() {
  * The pupil (inner circle) dynamically scales based on needle insertion depth,
  * simulating a surgical response (deeper insertion → larger pupil).
  */
+/**
+ * Iris — coloured ring + dilated pupil.
+ *
+ * Key fix: the iris ring inner radius and the pupil disc radius are driven
+ * from the SAME computed value each frame, so there is never a dark gap
+ * ring or overlap between them regardless of dilation state. Previously
+ * the iris ringGeometry had a fixed inner hole (35% of outer) while the
+ * pupil disc scaled independently — at full mydriasis (88% of outer)
+ * the disc was 2.1× its base size but the iris hole stayed at 35%, leaving
+ * a visually prominent dark annular mismatch.
+ *
+ * Solution: iris ring = BufferGeometry rebuilt each frame to match the
+ * current pupil radius. Pupil disc geometry is also sized from the same
+ * computed radius. Both are pixel-perfect aligned at every dilation state.
+ *
+ * Dilation starts at 1 (fully mydriatic) — the eye is already draped and
+ * prepped, so there is no animation from small.
+ */
 export function Iris() {
   const IRIS_OUTER_RADIUS = EYEBALL_RADIUS * 0.38;
-  const IRIS_Z = EYEBALL_RADIUS - 0.5;
+  // Surgical mydriasis: pupil ~7-8 mm on a 24 mm (12 mm radius) globe
+  // = 7.5/12 = 0.625 of the eyeball radius, which is 0.625/0.38 ≈ 0.86 of iris outer.
+  // Use 0.86 so the iris ring is a narrow coloured annulus, not a thick band.
+  const PUPIL_RADIUS      = IRIS_OUTER_RADIUS * 0.86;
+  const IRIS_Z            = EYEBALL_RADIUS - 0.5;
 
+  const irisRingRef = useRef<THREE.Mesh>(null);
   const pupilMeshRef = useRef<THREE.Mesh>(null);
   const pupilMatRef  = useRef<THREE.MeshPhysicalMaterial>(null);
-  const dilationRef = useRef(0); // 0 = natural resting pupil, 1 = fully mydriatic (dilated)
 
   const irisTexture = useMemo(() => createIrisTexture(), []);
 
-  // Pupil dilation simulates pre-op mydriatic drops (tropicamide/phenylephrine).
-  // The eye is shown draped and speculum-fixed — by that point in a real case
-  // mydriasis is already complete, so the pupil animates open once on mount
-  // rather than waiting on curriculum/procedure state. Red-reflex glow still
-  // tracks microscope light independently.
-  useFrame((_, delta) => {
-    if (!pupilMeshRef.current) return;
+  // Pre-build geometries sized to the final dilated state — no animation needed.
+  const irisRingGeometry = useMemo(() =>
+    new THREE.RingGeometry(PUPIL_RADIUS, IRIS_OUTER_RADIUS, 128), []);
+  const pupilGeometry = useMemo(() =>
+    new THREE.CircleGeometry(PUPIL_RADIUS, 96), []);
 
-    const target = 1; // always fully dilated — eye is already prepped/draped
-    // Fast ease (~0.4s time constant) — mimics drops having already taken effect
-    dilationRef.current += (target - dilationRef.current) * Math.min(1, delta * 6);
-
-    const restingRatio  = 0.42; // natural undilated pupil, pre-medication (animation start point only)
-    const dilatedRatio  = 0.88; // fully dilated surgical working diameter (~7-8mm, typical surgical mydriasis)
-    const ratio = restingRatio + (dilatedRatio - restingRatio) * dilationRef.current;
-    pupilMeshRef.current.scale.set(ratio / restingRatio, ratio / restingRatio, 1);
-
-    if (pupilMatRef.current) {
-      const rrIntensity = microscope.getLightIntensities().redReflex;
-      const glow = Math.max(0, rrIntensity - 0.2) * 0.55;
-      pupilMatRef.current.emissiveIntensity = glow;
-      pupilMatRef.current.opacity = Math.max(0.50, 0.92 - glow * 0.5);
-      pupilMatRef.current.needsUpdate = true;
-    }
+  useFrame(() => {
+    if (!pupilMatRef.current) return;
+    // Red-reflex glow through the transparent pupil, driven by microscope coaxial
+    const rrIntensity = microscope.getLightIntensities().redReflex;
+    const glow = Math.max(0, rrIntensity - 0.15) * 0.6;
+    pupilMatRef.current.emissiveIntensity = glow;
+    pupilMatRef.current.opacity = Math.max(0.45, 0.90 - glow * 0.55);
+    pupilMatRef.current.needsUpdate = true;
   });
 
   return (
     <>
-      <mesh position={[0, 0, IRIS_Z]} rotation={[0, 0, 0]}>
-        <ringGeometry args={[IRIS_OUTER_RADIUS * 0.35, IRIS_OUTER_RADIUS, 128]} />
+      {/* Iris ring — narrow coloured annulus between pupil edge and limbus */}
+      <mesh ref={irisRingRef} geometry={irisRingGeometry} position={[0, 0, IRIS_Z]}>
         <meshPhysicalMaterial
           map={irisTexture}
           emissive={COLORS.iris}
@@ -379,27 +391,26 @@ export function Iris() {
         />
       </mesh>
 
-      {/* Pupil — semi-transparent so the red-reflex point light behind the lens
-          reaches the camera as a fundal glow; emissiveIntensity driven each frame. */}
+      {/* Pupil disc — dark, semi-transparent to show red-reflex fundal glow.
+          Sized to PUPIL_RADIUS, exactly matching the iris ring inner hole. */}
       <mesh
         ref={pupilMeshRef}
+        geometry={pupilGeometry}
         position={[0, 0, IRIS_Z - 0.02]}
-        rotation={[0, 0, 0]}
       >
-        <circleGeometry args={[IRIS_OUTER_RADIUS * 0.35, 48]} />
         <meshPhysicalMaterial
           ref={pupilMatRef}
-          color="#050510"
-          emissive={new THREE.Color('#cc2200')}
+          color="#04040e"
+          emissive={new THREE.Color('#bb1f00')}
           emissiveIntensity={0}
           transparent
-          opacity={0.92}
-          roughness={0.7}
+          opacity={0.90}
+          roughness={0.8}
           metalness={0.0}
-          transmission={0.12}
-          thickness={1.0}
-          clearcoat={0.6}
-          clearcoatRoughness={0.1}
+          transmission={0.14}
+          thickness={1.2}
+          clearcoat={0.5}
+          clearcoatRoughness={0.15}
           side={THREE.DoubleSide}
           depthTest={false}
           depthWrite={false}
