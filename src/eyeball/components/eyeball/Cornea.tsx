@@ -237,20 +237,20 @@ export function Cornea() {
   return (
     <mesh geometry={geometry} position={[0, 0, CORNEA_CENTER_Z]}>
       <meshPhysicalMaterial
-        color={COLORS.cornea}
+        color="#f8fcff"
         transparent
-        opacity={0.25}
-        roughness={0.01}
+        opacity={0.18}
+        roughness={0.008}
         metalness={0.0}
         clearcoat={1.0}
-        clearcoatRoughness={0.01}
-        transmission={0.95}
-        thickness={3.0}
-        attenuationColor={new THREE.Color('#e8f4ff')}
-        attenuationDistance={10.0}
+        clearcoatRoughness={0.008}
+        transmission={0.97}
+        thickness={3.5}
+        attenuationColor={new THREE.Color('#f0f8ff')}
+        attenuationDistance={15.0}
         side={THREE.DoubleSide}
         ior={1.376}
-        envMapIntensity={1.5}
+        envMapIntensity={2.0}
       />
     </mesh>
   );
