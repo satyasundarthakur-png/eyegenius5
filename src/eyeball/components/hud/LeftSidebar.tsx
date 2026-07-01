@@ -73,6 +73,7 @@ interface LeftSidebarProps {
   scorePanel: ReactNode;
   controlPanel: ReactNode;
   operativeFieldBadge: ReactNode;
+  glossaryPanel: ReactNode;
   onClose?: () => void;
 }
 
@@ -86,7 +87,8 @@ type SectionId =
   | "curriculum"
   | "score"
   | "controls"
-  | "manual";
+  | "manual"
+  | "glossary";
 
 export function LeftSidebar({
   procedurePanel,
@@ -99,6 +101,7 @@ export function LeftSidebar({
   scorePanel,
   controlPanel,
   operativeFieldBadge,
+  glossaryPanel,
   onClose,
 }: LeftSidebarProps) {
   const [openSection, setOpenSection] = useState<SectionId>("curriculum");
@@ -246,6 +249,19 @@ export function LeftSidebar({
             }}
           >
             {minimapPanel}
+          </Section>
+
+          <Section
+            id="glossary"
+            icon={BookOpen}
+            label="Surgical Glossary"
+            accent="text-purple-400"
+            open={openSection === "glossary"}
+            onToggle={() => {
+              toggle("glossary");
+            }}
+          >
+            {glossaryPanel}
           </Section>
 
           <Section
