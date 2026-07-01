@@ -119,6 +119,7 @@ function App() {
             scorePanel={<ScoreCoachPanel />}
             controlPanel={<ControlPanel />}
             operativeFieldBadge={<OperativeFieldBadge />}
+            onClose={toggleHUD}
           />
 
           {/* RIGHT — slim strip: depth chart + entry points stacked */}

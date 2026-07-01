@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect, type ReactNode } from 'react';
+import { useState, useRef, type ReactNode } from 'react';
 import {
   Eye, Layers, Wrench, Microscope as MicroscopeIcon,
-  Activity, Map, BookOpen, ChevronRight,
-  GraduationCap, Award, Settings, LifeBuoy,
+  Activity, Map, LifeBuoy,
+  GraduationCap, Award, Settings, ChevronRight, LogOut, AlertTriangle,
 } from 'lucide-react';
+import { useSimulationStore } from '../../stores/simulationStore';
 
 // ─── Accordion item ────────────────────────────────────────────────────────────
 interface SectionProps {
@@ -62,6 +63,7 @@ interface LeftSidebarProps {
   scorePanel: ReactNode;
   controlPanel: ReactNode;
   operativeFieldBadge: ReactNode;
+  onClose?: () => void;
 }
 
 type SectionId =
@@ -77,16 +79,9 @@ type SectionId =
   | 'manual';
 
 export function LeftSidebar({
-  procedurePanel,
-  instrumentPanel,
-  modePanel,
-  microscopePanel,
-  kinematicsPanel,
-  minimapPanel,
-  curriculumPanel,
-  scorePanel,
-  controlPanel,
-  operativeFieldBadge,
+  procedurePanel, instrumentPanel, modePanel, microscopePanel,
+  kinematicsPanel, minimapPanel, curriculumPanel, scorePanel,
+  controlPanel, operativeFieldBadge, onClose,
 }: LeftSidebarProps) {
   const [openSection, setOpenSection] = useState<SectionId>('curriculum');
 
@@ -99,7 +94,6 @@ export function LeftSidebar({
       className="pointer-events-auto fixed left-4 top-4 bottom-4 z-30 flex flex-col"
       style={{ width: '264px' }}
     >
-      {/* Card shell */}
       <div className="flex h-full flex-col overflow-hidden rounded-xl border border-blue-500/20 bg-gray-950/92 shadow-2xl backdrop-blur-md">
 
         {/* Header */}
@@ -108,9 +102,18 @@ export function LeftSidebar({
           <span className="text-[11px] font-bold uppercase tracking-widest text-blue-300">
             OpenEyeSim
           </span>
-          <span className="ml-auto rounded bg-blue-500/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-blue-400">
+          <span className="rounded bg-blue-500/15 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-blue-400">
             Control Panel
           </span>
+          {onClose && (
+            <button
+              onClick={onClose}
+              title="Close panel"
+              className="ml-auto flex h-5 w-5 items-center justify-center rounded border border-white/10 text-white/30 hover:border-red-500/40 hover:text-red-400 transition-colors"
+            >
+              <span className="text-[11px] leading-none">✕</span>
+            </button>
+          )}
         </div>
 
         {/* Scrollable accordion body */}
@@ -183,14 +186,76 @@ export function LeftSidebar({
           </Section>
         </div>
 
-        {/* Footer */}
-        <div className="border-t border-white/8 px-3 py-2">
-          <p className="text-[9px] text-blue-300/30 text-center tracking-wider uppercase">
-            LVPEI · OpenEyeSim v2
-          </p>
-        </div>
+        {/* Footer — Exit button */}
+        <ExitFooter />
       </div>
     </div>
+  );
+}
+
+// ─── Exit confirmation ─────────────────────────────────────────────────────────
+function ExitFooter() {
+  const [confirming, setConfirming] = useState(false);
+  const reset = useSimulationStore((s) => s.reset);
+  const toggleHUD = useSimulationStore((s) => s.toggleHUD);
+
+  function handleExit() {
+    reset();
+    toggleHUD(); // close the sidebar so the user lands on the clean intro state
+    setConfirming(false);
+    // Clear localStorage onboarding flag so the intro overlay shows again
+    try { localStorage.removeItem('openeyesim-onboarded-v1'); } catch { /* */ }
+    // Force a page reload — cleanest way to return to the intro state
+    window.location.reload();
+  }
+
+  return (
+    <>
+      {/* Confirmation modal */}
+      {confirming && (
+        <div className="absolute inset-0 z-50 flex items-end justify-center pb-16">
+          <div className="pointer-events-auto mx-3 w-full overflow-hidden rounded-xl border border-red-500/30 bg-gray-950/98 shadow-2xl backdrop-blur-md">
+            <div className="flex items-center gap-2 border-b border-red-500/20 px-3 py-2.5">
+              <AlertTriangle size={13} className="text-red-400" strokeWidth={2} />
+              <span className="text-[11px] font-semibold text-red-300">Exit Session?</span>
+            </div>
+            <div className="px-3 py-2.5">
+              <p className="mb-3 text-[11px] text-blue-200/60 leading-relaxed">
+                This will reset all progress, entry points, and recorded trails. The intro screen will reopen.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { setConfirming(false); }}
+                  className="flex-1 rounded-lg border border-blue-500/30 py-1.5 text-[11px] font-semibold text-blue-300 hover:bg-blue-500/10 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleExit}
+                  className="flex-1 rounded-lg bg-red-600/80 py-1.5 text-[11px] font-semibold text-white hover:bg-red-600 transition-colors"
+                >
+                  Exit & Reset
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="border-t border-white/8 px-3 py-2 flex items-center gap-2">
+        <p className="flex-1 text-[9px] text-blue-300/25 tracking-wider uppercase">
+          LVPEI · OpenEyeSim v2
+        </p>
+        <button
+          onClick={() => { setConfirming(true); }}
+          title="Exit session and return to intro"
+          className="pointer-events-auto flex items-center gap-1 rounded border border-red-500/20 bg-red-500/8 px-2 py-1 text-[10px] font-semibold text-red-400/70 hover:border-red-500/40 hover:bg-red-500/15 hover:text-red-300 transition-colors"
+        >
+          <LogOut size={10} strokeWidth={2} />
+          Exit
+        </button>
+      </div>
+    </>
   );
 }
 
