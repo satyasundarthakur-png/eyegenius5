@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -7,8 +7,8 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from 'recharts';
-import { useSimulationStore } from '../../stores/simulationStore';
+} from "recharts";
+import { useSimulationStore } from "../../stores/simulationStore";
 
 /**
  * Real-time depth chart showing insertion depth over time.
@@ -43,33 +43,24 @@ export function RealTimeChart() {
         <span className="text-[10px] text-blue-300/70">
           Current: <span className="font-mono">{insertionDepth.toFixed(1)} mm</span>
         </span>
-        <span className="text-[10px] text-blue-300/50">
-          {chartData.length} pts
-        </span>
+        <span className="text-[10px] text-blue-300/50">{chartData.length} pts</span>
       </div>
 
       <div className="h-[120px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={formattedData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e3a5f" />
-            <XAxis
-              dataKey="time"
-              tick={{ fill: '#93c5fd', fontSize: 9 }}
-              stroke="#4488ff"
-            />
-            <YAxis
-              tick={{ fill: '#93c5fd', fontSize: 9 }}
-              stroke="#4488ff"
-            />
+            <XAxis dataKey="time" tick={{ fill: "#93c5fd", fontSize: 9 }} stroke="#4488ff" />
+            <YAxis tick={{ fill: "#93c5fd", fontSize: 9 }} stroke="#4488ff" />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'rgba(10, 10, 30, 0.9)',
-                border: '1px solid rgba(100, 140, 255, 0.3)',
-                borderRadius: '4px',
-                color: '#c8d8f0',
-                fontSize: '11px',
+                backgroundColor: "rgba(10, 10, 30, 0.9)",
+                border: "1px solid rgba(100, 140, 255, 0.3)",
+                borderRadius: "4px",
+                color: "#c8d8f0",
+                fontSize: "11px",
               }}
-              labelStyle={{ color: '#93c5fd' }}
+              labelStyle={{ color: "#93c5fd" }}
             />
             <Line
               type="monotone"
@@ -77,7 +68,7 @@ export function RealTimeChart() {
               stroke="#4488ff"
               strokeWidth={2}
               dot={false}
-              activeDot={{ r: 3, fill: '#4488ff', stroke: 'white', strokeWidth: 2 }}
+              activeDot={{ r: 3, fill: "#4488ff", stroke: "white", strokeWidth: 2 }}
             />
           </LineChart>
         </ResponsiveContainer>

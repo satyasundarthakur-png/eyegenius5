@@ -1,6 +1,6 @@
-import { useRef, useEffect } from 'react';
-import { useSimulationStore } from '../stores/simulationStore';
-import { MAX_INSERTION_DEPTH } from '../constants';
+import { useRef, useEffect } from "react";
+import { useSimulationStore } from "../stores/simulationStore";
+import { MAX_INSERTION_DEPTH } from "../constants";
 
 /**
  * Handles touch pinch-to-zoom gestures for adjusting insertion depth on mobile devices.
@@ -22,7 +22,7 @@ export function useTouchPinch() {
   }
 
   function handleTouchStart(e: TouchEvent) {
-    if (mode !== 'EDIT' || !rcmPoint) return;
+    if (mode !== "EDIT" || !rcmPoint) return;
     if (e.touches.length === 2) {
       initialPinchDistance.current = getPinchDistance(e.touches);
       initialDepth.current = useSimulationStore.getState().insertionDepth;
@@ -30,7 +30,7 @@ export function useTouchPinch() {
   }
 
   function handleTouchMove(e: TouchEvent) {
-    if (mode !== 'EDIT' || !rcmPoint) return;
+    if (mode !== "EDIT" || !rcmPoint) return;
     if (e.touches.length === 2 && initialPinchDistance.current !== null) {
       e.preventDefault();
       const currentDistance = getPinchDistance(e.touches);
@@ -45,17 +45,17 @@ export function useTouchPinch() {
   }
 
   useEffect(() => {
-    const canvas = document.querySelector('canvas');
+    const canvas = document.querySelector("canvas");
     if (!canvas) return;
 
-    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-    canvas.addEventListener('touchend', handleTouchEnd);
+    canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
+    canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
+    canvas.addEventListener("touchend", handleTouchEnd);
 
     return () => {
-      canvas.removeEventListener('touchstart', handleTouchStart);
-      canvas.removeEventListener('touchmove', handleTouchMove);
-      canvas.removeEventListener('touchend', handleTouchEnd);
+      canvas.removeEventListener("touchstart", handleTouchStart);
+      canvas.removeEventListener("touchmove", handleTouchMove);
+      canvas.removeEventListener("touchend", handleTouchEnd);
     };
   });
 }

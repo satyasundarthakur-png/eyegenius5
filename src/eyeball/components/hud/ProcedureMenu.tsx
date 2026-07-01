@@ -1,6 +1,6 @@
-import { Droplet, Eye, Microscope, Scissors } from 'lucide-react';
-import { useSimulationStore } from '../../stores/simulationStore';
-import { PROCEDURES, type SurgicalProcedure } from '../../stores/procedureSlice';
+import { Droplet, Eye, Microscope, Scissors } from "lucide-react";
+import { useSimulationStore } from "../../stores/simulationStore";
+import { PROCEDURES, type SurgicalProcedure } from "../../stores/procedureSlice";
 
 /** One icon per surgical module — quick visual recognition at a glance. */
 const PROCEDURE_ICONS: Record<SurgicalProcedure, typeof Eye> = {
@@ -17,7 +17,7 @@ export function ProcedureMenu() {
   const current = PROCEDURES.find((p) => p.id === selectedProcedure);
 
   return (
-    <div className="pointer-events-auto w-64 rounded-lg border border-blue-500/30 bg-gray-950/85 p-3 text-blue-100 backdrop-blur">
+    <div className="text-blue-100">
       <h3 className="mb-2 border-b border-blue-500/20 pb-1 text-xs font-semibold tracking-wider text-blue-400 uppercase">
         Surgical Procedure
       </h3>
@@ -34,15 +34,15 @@ export function ProcedureMenu() {
               }}
               className={`relative flex items-center gap-1.5 rounded px-2 py-1.5 text-left text-xs font-medium transition-colors ${
                 isActive
-                  ? 'border border-blue-400 bg-blue-600 text-white'
-                  : 'border border-transparent text-gray-300 hover:bg-gray-800 hover:text-gray-100'
+                  ? "border border-blue-400 bg-blue-600 text-white"
+                  : "border border-transparent text-gray-300 hover:bg-gray-800 hover:text-gray-100"
               }`}
             >
               <Icon
-                className={`h-3.5 w-3.5 flex-shrink-0 ${isActive ? 'text-white' : 'text-blue-400/70'}`}
+                className={`h-3.5 w-3.5 flex-shrink-0 ${isActive ? "text-white" : "text-blue-400/70"}`}
                 aria-hidden="true"
               />
-              <span>{proc.name.replace(' Surgery', '')}</span>
+              <span>{proc.name.replace(" Surgery", "")}</span>
               {!proc.hasGuidedCurriculum && (
                 <span className="absolute top-0.5 right-1 text-[8px] uppercase tracking-wide text-amber-400/80">
                   beta

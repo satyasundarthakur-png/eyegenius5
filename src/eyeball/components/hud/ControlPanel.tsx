@@ -1,30 +1,25 @@
-import { useRef, useState, useEffect } from 'react';
-import { useSimulationStore } from '../../stores/simulationStore';
-import { ENTRY_POINT_LABEL } from '../../constants/terminology';
-import { MAX_INSERTION_DEPTH, MAX_TILT_ANGLE } from '../../constants';
-import { exportTrailJSON, importTrailJSON, createScreenRecorder } from '../../lib/export';
-import { SettingsPanel } from './SettingsPanel';
-import { Slider } from '../ui/slider';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '../ui/tooltip';
-import { useActionLogger } from '../../hooks/useActionLogger';
+import { useRef, useState, useEffect } from "react";
+import { useSimulationStore } from "../../stores/simulationStore";
+import { ENTRY_POINT_LABEL } from "../../constants/terminology";
+import { MAX_INSERTION_DEPTH, MAX_TILT_ANGLE } from "../../constants";
+import { exportTrailJSON, importTrailJSON, createScreenRecorder } from "../../lib/export";
+import { SettingsPanel } from "./SettingsPanel";
+import { Slider } from "../ui/slider";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import { useActionLogger } from "../../hooks/useActionLogger";
 
-const phaseBadgeVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  IDLE: 'outline',
-  CONTACT: 'secondary',
-  INSERTING: 'default',
-  WITHDRAWING: 'secondary',
-  COMPLETE: 'destructive',
+const phaseBadgeVariant: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+  IDLE: "outline",
+  CONTACT: "secondary",
+  INSERTING: "default",
+  WITHDRAWING: "secondary",
+  COMPLETE: "destructive",
 };
 
 const kbdClass =
-  'inline-flex h-5 items-center justify-center rounded border border-blue-500/30 bg-blue-500/15 px-1 font-mono text-[10px] text-blue-100';
+  "inline-flex h-5 items-center justify-center rounded border border-blue-500/30 bg-blue-500/15 px-1 font-mono text-[10px] text-blue-100";
 
 export function ControlPanel() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -58,11 +53,11 @@ export function ControlPanel() {
   const { exportLog, clearLog } = useActionLogger();
 
   function handleExportLog() {
-    const blob = new Blob([exportLog()], { type: 'application/json' });
+    const blob = new Blob([exportLog()], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'eyeball-action-log.json';
+    a.download = "eyeball-action-log.json";
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -87,21 +82,21 @@ export function ControlPanel() {
   }
 
   function handleScreenshot() {
-    const canvas = document.querySelector<HTMLCanvasElement>('canvas');
+    const canvas = document.querySelector<HTMLCanvasElement>("canvas");
     if (!canvas) return;
     canvas.toBlob((blob) => {
       if (!blob) return;
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
-      a.download = 'eyeball-screenshot.png';
+      a.download = "eyeball-screenshot.png";
       a.click();
       URL.revokeObjectURL(url);
-    }, 'image/png');
+    }, "image/png");
   }
 
   useEffect(() => {
-    const canvas = document.querySelector<HTMLCanvasElement>('canvas');
+    const canvas = document.querySelector<HTMLCanvasElement>("canvas");
     if (!canvas) return;
     requestAnimationFrame(() => {
       setRecorder(createScreenRecorder(canvas));
@@ -119,12 +114,12 @@ export function ControlPanel() {
     }
   }
 
-  const isEditMode = mode === 'EDIT';
-  const isReplayMode = mode === 'REPLAY';
+  const isEditMode = mode === "EDIT";
+  const isReplayMode = mode === "REPLAY";
 
   return (
     <TooltipProvider delayDuration={300}>
-      <div className="pointer-events-auto w-full rounded-lg border border-blue-500/30 bg-gray-950/85 p-3 text-blue-100 backdrop-blur sm:min-w-[240px] sm:p-4">
+      <div className="text-blue-100">
         <h3 className="mb-2 border-b border-blue-500/20 pb-1 text-xs font-semibold tracking-wider text-blue-400 uppercase sm:mb-3 sm:text-sm">
           Controls
         </h3>
@@ -132,7 +127,7 @@ export function ControlPanel() {
         {/* Phase indicator */}
         <div className="mb-3 flex items-center justify-between rounded bg-blue-500/10 px-2 py-1">
           <span className="text-xs text-blue-300/70">Phase</span>
-          <Badge variant={phaseBadgeVariant[phase] ?? 'outline'} className="tracking-wider">
+          <Badge variant={phaseBadgeVariant[phase] ?? "outline"} className="tracking-wider">
             {phase}
           </Badge>
         </div>
@@ -140,25 +135,25 @@ export function ControlPanel() {
         {/* Mode-specific content */}
         {!isEditMode && !isReplayMode && (
           <div className="mb-3 rounded border border-blue-500/15 bg-blue-500/5 px-3 py-2 text-xs text-blue-300/70">
-            {mode === 'VIEW' && (
+            {mode === "VIEW" && (
               <p>
-                Free observation mode. Switch to{' '}
+                Free observation mode. Switch to{" "}
                 <button
                   className="text-green-400 underline hover:text-green-300"
                   onClick={() => {
                     if (rcmPoint) {
-                      setMode('EDIT');
+                      setMode("EDIT");
                     } else {
-                      setMode('PLACE');
+                      setMode("PLACE");
                     }
                   }}
                 >
-                  {rcmPoint ? 'Edit' : 'Place'}
-                </button>{' '}
+                  {rcmPoint ? "Edit" : "Place"}
+                </button>{" "}
                 to interact with the needle.
               </p>
             )}
-            {mode === 'PLACE' && !rcmPoint && (
+            {mode === "PLACE" && !rcmPoint && (
               <p>Click on the eyeball surface to mark the {ENTRY_POINT_LABEL.toLowerCase()}.</p>
             )}
           </div>
@@ -219,10 +214,10 @@ export function ControlPanel() {
               <label className="mb-1.5 block text-sm text-blue-100">Preset Angles</label>
               <div className="flex flex-wrap gap-2">
                 {[
-                  [0, 0, '0deg'],
-                  [Math.PI / 12, 0, '15deg'],
-                  [Math.PI / 6, 0, '30deg'],
-                  [MAX_TILT_ANGLE, 0, '45deg'],
+                  [0, 0, "0deg"],
+                  [Math.PI / 12, 0, "15deg"],
+                  [Math.PI / 6, 0, "30deg"],
+                  [MAX_TILT_ANGLE, 0, "45deg"],
                 ].map(([a, b, label]) => (
                   <Button
                     key={label}
@@ -258,7 +253,7 @@ export function ControlPanel() {
                     width:
                       trailData.length > 0
                         ? `${((playbackIndex / (trailData.length - 1)) * 100).toFixed(1)}%`
-                        : '0%',
+                        : "0%",
                   }}
                 />
               </div>
@@ -333,16 +328,16 @@ export function ControlPanel() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant={isRecording ? 'destructive' : 'outline'}
+                  variant={isRecording ? "destructive" : "outline"}
                   size="sm"
                   onClick={handleToggleRecording}
                   className={
                     isRecording
-                      ? ''
-                      : 'border-purple-500/40 bg-purple-500/20 text-purple-400 hover:bg-purple-500/30'
+                      ? ""
+                      : "border-purple-500/40 bg-purple-500/20 text-purple-400 hover:bg-purple-500/30"
                   }
                 >
-                  {isRecording ? '⏹ Stop' : '⏺ Record'}
+                  {isRecording ? "⏹ Stop" : "⏺ Record"}
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">Record simulation as video (.webm)</TooltipContent>
@@ -413,21 +408,21 @@ export function ControlPanel() {
                   if (isReplayMode) {
                     togglePlayback();
                   } else if (trailCount > 0) {
-                    setMode('REPLAY');
+                    setMode("REPLAY");
                   }
                 }}
                 disabled={trailCount === 0}
                 className={
                   isReplayMode && isPlaying
-                    ? 'border-amber-500/40 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'
-                    : 'border-green-500/40 bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                    ? "border-amber-500/40 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30"
+                    : "border-green-500/40 bg-green-500/20 text-green-400 hover:bg-green-500/30"
                 }
               >
-                {isReplayMode && isPlaying ? 'Stop' : trailCount > 0 ? 'Replay' : 'No Data'}
+                {isReplayMode && isPlaying ? "Stop" : trailCount > 0 ? "Replay" : "No Data"}
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top">
-              {isReplayMode && isPlaying ? 'Stop playback' : 'Replay recorded trail'}
+              {isReplayMode && isPlaying ? "Stop playback" : "Replay recorded trail"}
             </TooltipContent>
           </Tooltip>
 
@@ -482,7 +477,7 @@ export function ControlPanel() {
                 variant="outline"
                 size="sm"
                 onClick={completeSurgery}
-                disabled={phase !== 'WITHDRAWING'}
+                disabled={phase !== "WITHDRAWING"}
                 className="border-green-500/40 bg-green-500/20 text-green-400 hover:bg-green-500/30"
               >
                 Complete
@@ -510,15 +505,13 @@ export function ControlPanel() {
         <div className="mt-3 border-t border-blue-500/15 pt-2 text-[11px] text-blue-300/50">
           <p className="mb-1 text-xs font-semibold text-blue-400">Keyboard Shortcuts</p>
           <p>
-            <kbd className={kbdClass}>V</kbd> View &nbsp;{' '}
-            <kbd className={kbdClass}>P</kbd> Place &nbsp;{' '}
-            <kbd className={kbdClass}>E</kbd> Edit &nbsp;{' '}
-            <kbd className={kbdClass}>R</kbd> Replay
+            <kbd className={kbdClass}>V</kbd> View &nbsp; <kbd className={kbdClass}>P</kbd> Place
+            &nbsp; <kbd className={kbdClass}>E</kbd> Edit &nbsp; <kbd className={kbdClass}>R</kbd>{" "}
+            Replay
           </p>
           <p>
-            <kbd className={kbdClass}>Esc</kbd> Reset &nbsp;{' '}
-            <kbd className={kbdClass}>C</kbd> Clear trails &nbsp;{' '}
-            <kbd className={kbdClass}>Ctrl+Z</kbd> Undo &nbsp;{' '}
+            <kbd className={kbdClass}>Esc</kbd> Reset &nbsp; <kbd className={kbdClass}>C</kbd> Clear
+            trails &nbsp; <kbd className={kbdClass}>Ctrl+Z</kbd> Undo &nbsp;{" "}
             <kbd className={kbdClass}>Ctrl+Shift+Z</kbd> Redo
           </p>
           <p>
@@ -527,7 +520,13 @@ export function ControlPanel() {
           </p>
         </div>
 
-        {showSettings && <SettingsPanel onClose={() => { setShowSettings(false); }} />}
+        {showSettings && (
+          <SettingsPanel
+            onClose={() => {
+              setShowSettings(false);
+            }}
+          />
+        )}
       </div>
     </TooltipProvider>
   );

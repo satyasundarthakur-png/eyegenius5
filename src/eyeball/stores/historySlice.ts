@@ -1,7 +1,7 @@
-import type { StateCreator } from 'zustand';
-import type { Vec3, SimulationMode, TrailPoint, SurgicalPhase } from '../types';
-import type { SimulationState } from './simulationStore';
-import type { RCMPoint } from './rcmSlice';
+import type { StateCreator } from "zustand";
+import type { Vec3, SimulationMode, TrailPoint, SurgicalPhase } from "../types";
+import type { SimulationState } from "./simulationStore";
+import type { RCMPoint } from "./rcmSlice";
 
 const MAX_HISTORY = 50;
 
@@ -80,7 +80,10 @@ function restoreFromSnapshot(snapshot: HistoryState): Partial<SimulationState> {
   };
 }
 
-export const createHistorySlice: StateCreator<SimulationState, [], [], HistorySlice> = (set, get) => ({
+export const createHistorySlice: StateCreator<SimulationState, [], [], HistorySlice> = (
+  set,
+  get,
+) => ({
   history: [],
   historyIndex: -1,
   canUndo: false,

@@ -1,6 +1,6 @@
-import { EYEBALL_RADIUS } from '../../constants';
-import { useMouseControl } from '../../hooks/useMouseControl';
-import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
+import { EYEBALL_RADIUS } from "../../constants";
+import { useMouseControl } from "../../hooks/useMouseControl";
+import { useKeyboardShortcuts } from "../../hooks/useKeyboardShortcuts";
 
 /**
  * Invisible sphere that captures mouse/pointer interaction on the eyeball

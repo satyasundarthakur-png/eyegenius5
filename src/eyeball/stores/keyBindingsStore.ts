@@ -1,23 +1,23 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 /** Default keyboard shortcuts */
 export const DEFAULT_KEYBINDINGS: KeyBindings = {
-  modeView: 'v',
-  modePlace: 'p',
-  modeEdit: 'e',
-  modeReplay: 'r',
-  insertUp: 'ArrowUp',
-  withdrawDown: 'ArrowDown',
-  rotateLeft: 'ArrowLeft',
-  rotateRight: 'ArrowRight',
-  preset1: '1',
-  preset2: '2',
-  preset3: '3',
-  preset4: '4',
-  reset: 'Escape',
-  clearTrails: 'c',
-  undo: 'z',
-  redo: 'y',
+  modeView: "v",
+  modePlace: "p",
+  modeEdit: "e",
+  modeReplay: "r",
+  insertUp: "ArrowUp",
+  withdrawDown: "ArrowDown",
+  rotateLeft: "ArrowLeft",
+  rotateRight: "ArrowRight",
+  preset1: "1",
+  preset2: "2",
+  preset3: "3",
+  preset4: "4",
+  reset: "Escape",
+  clearTrails: "c",
+  undo: "z",
+  redo: "y",
 };
 
 export interface KeyBindings {
@@ -45,7 +45,7 @@ export interface KeyBindingsState {
   resetKeyBindings: () => void;
 }
 
-const STORAGE_KEY = 'eyeball-keybindings';
+const STORAGE_KEY = "eyeball-keybindings";
 
 function loadKeyBindings(): KeyBindings {
   try {

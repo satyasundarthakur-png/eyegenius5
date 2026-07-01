@@ -1,26 +1,26 @@
-import { Canvas } from '@react-three/fiber';
-import * as THREE from 'three';
-import { useState } from 'react';
-import { Scene } from './components/scene/Scene';
-import { KinematicsPanel } from './components/hud/KinematicsPanel';
-import { ControlPanel } from './components/hud/ControlPanel';
-import { ModePanel } from './components/hud/ModePanel';
-import { RCMPointList } from './components/hud/RCMPointList';
-import { RealTimeChart } from './components/hud/RealTimeChart';
-import { MiniMap } from './components/hud/MiniMap';
-import { InstrumentPanel } from './components/hud/InstrumentPanel';
-import { MicroscopePanel } from './components/hud/MicroscopePanel';
-import { CurriculumPanel } from './components/hud/CurriculumPanel';
-import { ScoreCoachPanel } from './components/hud/ScoreCoachPanel';
-import { ProcedureMenu } from './components/hud/ProcedureMenu';
-import { OperativeFieldBadge } from './components/hud/OperativeFieldBadge';
-import { SurgicalStatusBar } from './components/hud/SurgicalStatusBar';
-import { StepGuide } from './components/hud/StepGuide';
-import { OnboardingOverlay, hasSeenOnboarding } from './components/OnboardingOverlay';
-import { LeftSidebar } from './components/hud/LeftSidebar';
-import { useThemeStore } from './stores/themeStore';
-import { useSimulationStore } from './stores/simulationStore';
-import type { SurgicalProcedure } from './stores/procedureSlice';
+import { Canvas } from "@react-three/fiber";
+import * as THREE from "three";
+import { useState } from "react";
+import { Scene } from "./components/scene/Scene";
+import { KinematicsPanel } from "./components/hud/KinematicsPanel";
+import { ControlPanel } from "./components/hud/ControlPanel";
+import { ModePanel } from "./components/hud/ModePanel";
+import { RCMPointList } from "./components/hud/RCMPointList";
+import { RealTimeChart } from "./components/hud/RealTimeChart";
+import { MiniMap } from "./components/hud/MiniMap";
+import { InstrumentPanel } from "./components/hud/InstrumentPanel";
+import { MicroscopePanel } from "./components/hud/MicroscopePanel";
+import { CurriculumPanel } from "./components/hud/CurriculumPanel";
+import { ScoreCoachPanel } from "./components/hud/ScoreCoachPanel";
+import { ProcedureMenu } from "./components/hud/ProcedureMenu";
+import { OperativeFieldBadge } from "./components/hud/OperativeFieldBadge";
+import { SurgicalStatusBar } from "./components/hud/SurgicalStatusBar";
+import { StepGuide } from "./components/hud/StepGuide";
+import { OnboardingOverlay, hasSeenOnboarding } from "./components/OnboardingOverlay";
+import { LeftSidebar } from "./components/hud/LeftSidebar";
+import { useThemeStore } from "./stores/themeStore";
+import { useSimulationStore } from "./stores/simulationStore";
+import type { SurgicalProcedure } from "./stores/procedureSlice";
 
 /**
  * App — OpenEyeSim root shell
@@ -35,14 +35,14 @@ import type { SurgicalProcedure } from './stores/procedureSlice';
  *   TOP-RIGHT   — ☰ Help toggle
  */
 function App() {
-  const theme        = useThemeStore((s) => s.theme);
+  const theme = useThemeStore((s) => s.theme);
   const setProcedure = useSimulationStore((s) => s.setProcedure);
 
   const [showIntro, setShowIntro] = useState(() => !hasSeenOnboarding());
-  const showHUD   = useSimulationStore((s) => s.showHUD);
+  const showHUD = useSimulationStore((s) => s.showHUD);
   const toggleHUD = useSimulationStore((s) => s.toggleHUD);
 
-  const bgColor = theme === 'dark' ? '#0a0a1a' : '#f5f5f0';
+  const bgColor = theme === "dark" ? "#0a0a1a" : "#f5f5f0";
 
   function handleIntroDismiss(selectedProcedure: SurgicalProcedure) {
     setProcedure(selectedProcedure);
@@ -50,8 +50,9 @@ function App() {
   }
 
   return (
-    <div className={`relative h-screen w-screen overflow-hidden ${theme === 'dark' ? '' : 'bg-gray-100'}`}>
-
+    <div
+      className={`relative h-screen w-screen overflow-hidden ${theme === "dark" ? "" : "bg-gray-100"}`}
+    >
       {/* Intro overlay */}
       {showIntro && <OnboardingOverlay onDismiss={handleIntroDismiss} />}
 
@@ -83,20 +84,23 @@ function App() {
           pointer-events-auto fixed right-4 top-4 z-50
           flex items-center gap-1.5 rounded-lg border px-3 py-2
           text-xs font-semibold backdrop-blur transition-all duration-200
-          ${showHUD
-            ? 'border-red-500/50 bg-gray-950/90 text-red-300 hover:border-red-400 hover:text-red-100'
-            : 'border-blue-500/50 bg-gray-950/80 text-blue-300 hover:border-blue-400 hover:text-blue-100'
+          ${
+            showHUD
+              ? "border-red-500/50 bg-gray-950/90 text-red-300 hover:border-red-400 hover:text-red-100"
+              : "border-blue-500/50 bg-gray-950/80 text-blue-300 hover:border-blue-400 hover:text-blue-100"
           }
         `}
-        title={showHUD ? 'Hide panels' : 'Show panels / Help'}
+        title={showHUD ? "Hide panels" : "Show panels / Help"}
       >
-        {showHUD ? '✕ Close' : '☰ Help'}
+        {showHUD ? "✕ Close" : "☰ Help"}
       </button>
 
       {/* Replay intro */}
       {!showHUD && (
         <button
-          onClick={() => { setShowIntro(true); }}
+          onClick={() => {
+            setShowIntro(true);
+          }}
           className="pointer-events-auto fixed right-4 top-14 z-50 rounded-lg border border-blue-500/20 bg-gray-950/70 px-3 py-1.5 text-[10px] text-blue-400/60 backdrop-blur hover:text-blue-300/80 transition-colors"
           title="Replay intro / change procedure"
         >
@@ -125,7 +129,7 @@ function App() {
           {/* RIGHT — slim strip: depth chart + entry points stacked */}
           <div
             className="pointer-events-none fixed right-4 top-16 bottom-16 z-30 flex flex-col gap-2"
-            style={{ width: '220px' }}
+            style={{ width: "220px" }}
           >
             {/* Depth / real-time chart */}
             <div className="pointer-events-auto overflow-hidden rounded-xl border border-blue-500/20 bg-gray-950/92 backdrop-blur-md shadow-xl">

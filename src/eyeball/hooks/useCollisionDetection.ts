@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
-import { useNeedlePose } from './useNeedlePose';
-import { EYEBALL_RADIUS } from '../constants';
-import type { Vec3 } from '../types';
+import { useMemo } from "react";
+import { useNeedlePose } from "./useNeedlePose";
+import { EYEBALL_RADIUS } from "../constants";
+import type { Vec3 } from "../types";
 
 /**
  * Detects collision between needle tip and eyeball surface.

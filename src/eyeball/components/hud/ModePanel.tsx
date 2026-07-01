@@ -1,6 +1,6 @@
-import { useSimulationStore } from '../../stores/simulationStore';
-import type { SimulationMode } from '../../types';
-import { MODE_DISPLAY } from '../../constants/terminology';
+import { useSimulationStore } from "../../stores/simulationStore";
+import type { SimulationMode } from "../../types";
+import { MODE_DISPLAY } from "../../constants/terminology";
 
 interface ModeConfig {
   mode: SimulationMode;
@@ -13,36 +13,36 @@ interface ModeConfig {
 
 const MODES: ModeConfig[] = [
   {
-    mode: 'VIEW',
+    mode: "VIEW",
     label: MODE_DISPLAY.VIEW,
-    shortcut: 'V',
-    activeBg: 'bg-blue-600',
-    activeBorder: 'border-blue-400',
-    activeText: 'text-white',
+    shortcut: "V",
+    activeBg: "bg-blue-600",
+    activeBorder: "border-blue-400",
+    activeText: "text-white",
   },
   {
-    mode: 'PLACE',
+    mode: "PLACE",
     label: MODE_DISPLAY.PLACE,
-    shortcut: 'P',
-    activeBg: 'bg-green-600',
-    activeBorder: 'border-green-400',
-    activeText: 'text-white',
+    shortcut: "P",
+    activeBg: "bg-green-600",
+    activeBorder: "border-green-400",
+    activeText: "text-white",
   },
   {
-    mode: 'EDIT',
+    mode: "EDIT",
     label: MODE_DISPLAY.EDIT,
-    shortcut: 'E',
-    activeBg: 'bg-amber-600',
-    activeBorder: 'border-amber-400',
-    activeText: 'text-white',
+    shortcut: "E",
+    activeBg: "bg-amber-600",
+    activeBorder: "border-amber-400",
+    activeText: "text-white",
   },
   {
-    mode: 'REPLAY',
+    mode: "REPLAY",
     label: MODE_DISPLAY.REPLAY,
-    shortcut: 'R',
-    activeBg: 'bg-purple-600',
-    activeBorder: 'border-purple-400',
-    activeText: 'text-white',
+    shortcut: "R",
+    activeBg: "bg-purple-600",
+    activeBorder: "border-purple-400",
+    activeText: "text-white",
   },
 ];
 
@@ -53,13 +53,13 @@ export function ModePanel() {
   const setMode = useSimulationStore((s) => s.setMode);
 
   return (
-    <div className="pointer-events-auto flex items-center gap-1 rounded-lg border border-blue-500/30 bg-gray-950/85 px-1 py-0.5 backdrop-blur-sm sm:px-1.5 sm:py-1">
+    <div className="flex items-center gap-1">
       {MODES.map(({ mode: m, label, shortcut, activeBg, activeBorder, activeText }) => {
         const isActive = mode === m;
         const disabled =
-          (m === 'PLACE' && !!rcmPoint) ||
-          (m === 'EDIT' && !rcmPoint) ||
-          (m === 'REPLAY' && trailData.length === 0);
+          (m === "PLACE" && !!rcmPoint) ||
+          (m === "EDIT" && !rcmPoint) ||
+          (m === "REPLAY" && trailData.length === 0);
 
         return (
           <button
@@ -72,8 +72,8 @@ export function ModePanel() {
               isActive
                 ? `${activeBg} ${activeText} border ${activeBorder}`
                 : disabled
-                  ? 'cursor-not-allowed text-gray-600'
-                  : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
+                  ? "cursor-not-allowed text-gray-600"
+                  : "text-gray-400 hover:bg-gray-800 hover:text-gray-200"
             }`}
           >
             <span>{label}</span>

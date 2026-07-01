@@ -1,8 +1,8 @@
-import { useMemo, useRef, useEffect } from 'react';
-import { useSimulationStore } from '../stores/simulationStore';
-import { computeNeedlePose, type RCMConfig } from '../lib/rcm';
-import { MAX_INSERTION_DEPTH, MAX_TILT_ANGLE } from '../constants';
-import type { NeedlePose } from '../types';
+import { useMemo, useRef, useEffect } from "react";
+import { useSimulationStore } from "../stores/simulationStore";
+import { computeNeedlePose, type RCMConfig } from "../lib/rcm";
+import { MAX_INSERTION_DEPTH, MAX_TILT_ANGLE } from "../constants";
+import type { NeedlePose } from "../types";
 
 /**
  * Derives needle pose from store state — single source of truth.

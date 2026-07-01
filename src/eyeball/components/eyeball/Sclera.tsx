@@ -1,6 +1,6 @@
-import * as THREE from 'three';
-import { useMemo } from 'react';
-import { EYEBALL_RADIUS, COLORS } from '../../constants';
+import * as THREE from "three";
+import { useMemo } from "react";
+import { EYEBALL_RADIUS, COLORS } from "../../constants";
 
 /**
  * Seeded pseudo-random number generator (mulberry32).
@@ -36,10 +36,10 @@ interface VesselSegment {
  */
 function createVesselTexture(): THREE.CanvasTexture {
   const size = 1024;
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = size;
   canvas.height = size;
-  const rawCtx = canvas.getContext('2d');
+  const rawCtx = canvas.getContext("2d");
   if (!rawCtx) return new THREE.CanvasTexture(canvas);
   const ctx: CanvasRenderingContext2D = rawCtx;
 
@@ -47,14 +47,14 @@ function createVesselTexture(): THREE.CanvasTexture {
 
   /** Build an rgba() color string without template literal type issues. */
   const rgba = (r: number, g: number, b: number, a: number) =>
-    'rgba(' + r.toFixed(0) + ', ' + g.toFixed(0) + ', ' + b.toFixed(0) + ', ' + a.toFixed(3) + ')';
+    "rgba(" + r.toFixed(0) + ", " + g.toFixed(0) + ", " + b.toFixed(0) + ", " + a.toFixed(3) + ")";
 
   // Base: warm white sclera with subtle color variation
   const gradient = ctx.createLinearGradient(0, 0, 0, size);
-  gradient.addColorStop(0, '#f8f4f0');
-  gradient.addColorStop(0.3, '#f5f0ec');
-  gradient.addColorStop(0.7, '#f2ede8');
-  gradient.addColorStop(1, '#efe8e2');
+  gradient.addColorStop(0, "#f8f4f0");
+  gradient.addColorStop(0.3, "#f5f0ec");
+  gradient.addColorStop(0.7, "#f2ede8");
+  gradient.addColorStop(1, "#efe8e2");
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, size, size);
 
@@ -118,7 +118,7 @@ function createVesselTexture(): THREE.CanvasTexture {
       if (cx >= size) cx -= size;
 
       // Taper radius along segment
-      currentRadius = seg.radius * (1 - i / steps * 0.3);
+      currentRadius = seg.radius * (1 - (i / steps) * 0.3);
 
       ctx.lineTo(cx, cy);
 
@@ -140,8 +140,8 @@ function createVesselTexture(): THREE.CanvasTexture {
     // Draw with varying width (thicker at start, thinner at end)
     ctx.strokeStyle = rgba(baseR, baseG, baseB, baseOpacity);
     ctx.lineWidth = Math.max(0.5, seg.radius * 2);
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
     ctx.stroke();
 
     // Draw a second pass with slightly lighter color for depth illusion
@@ -165,15 +165,18 @@ function createVesselTexture(): THREE.CanvasTexture {
     const angle = Math.PI / 2 + (rng() - 0.5) * 0.6; // mostly downward
     const isVenous = rng() > 0.5;
 
-    drawVessel({
-      x: ((x % size) + size) % size,
-      y,
-      radius: 2.0 + rng() * 1.5,
-      generation: 0,
-      angle,
-      opacity: 0.35 + rng() * 0.15,
-      isVenous,
-    }, 0);
+    drawVessel(
+      {
+        x: ((x % size) + size) % size,
+        y,
+        radius: 2.0 + rng() * 1.5,
+        generation: 0,
+        angle,
+        opacity: 0.35 + rng() * 0.15,
+        isVenous,
+      },
+      0,
+    );
   }
 
   // Add secondary smaller trunks between the main ones
@@ -182,15 +185,18 @@ function createVesselTexture(): THREE.CanvasTexture {
     const y = LIMBUS_Y + size * 0.05 + rng() * size * 0.15;
     const angle = Math.PI / 2 + (rng() - 0.5) * 1.0;
 
-    drawVessel({
-      x,
-      y,
-      radius: 1.0 + rng() * 0.8,
-      generation: 0,
-      angle,
-      opacity: 0.2 + rng() * 0.1,
-      isVenous: rng() > 0.5,
-    }, 0);
+    drawVessel(
+      {
+        x,
+        y,
+        radius: 1.0 + rng() * 0.8,
+        generation: 0,
+        angle,
+        opacity: 0.2 + rng() * 0.1,
+        isVenous: rng() > 0.5,
+      },
+      0,
+    );
   }
 
   const texture = new THREE.CanvasTexture(canvas);
@@ -216,7 +222,7 @@ export function Sclera() {
         clearcoatRoughness={0.6}
         transmission={0.04}
         thickness={2.0}
-        attenuationColor={new THREE.Color('#fde8cc')}
+        attenuationColor={new THREE.Color("#fde8cc")}
         attenuationDistance={6.0}
         side={THREE.FrontSide}
         map={vesselMap}
@@ -244,32 +250,139 @@ export function EyeInterior() {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Retina texture — macula highlight + vascular tree silhouette
+// ---------------------------------------------------------------------------
+function createRetinaTexture(): THREE.CanvasTexture {
+  const size = 512;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const rawCtx = canvas.getContext("2d");
+  if (!rawCtx) return new THREE.CanvasTexture(canvas);
+  const ctx: CanvasRenderingContext2D = rawCtx;
+  const rng = createRng(77);
+  const cx = size * 0.5,
+    cy = size * 0.5;
+
+  // Base: deep red-orange fundal background (seen through dilated pupil under coaxial light)
+  const base = ctx.createRadialGradient(cx, cy, 0, cx, cy, size * 0.5);
+  base.addColorStop(0, "#c83818");
+  base.addColorStop(0.35, "#b83010");
+  base.addColorStop(0.7, "#9a2808");
+  base.addColorStop(1, "#701808");
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, size, size);
+
+  // Macula — darker, slightly brownish region temporal to the disc
+  // In a real fundus the macula appears darker than the surrounding retina
+  const mX = cx + size * 0.22,
+    mY = cy;
+  const macular = ctx.createRadialGradient(mX, mY, 0, mX, mY, size * 0.14);
+  macular.addColorStop(0, "#501008");
+  macular.addColorStop(0.5, "#8a2010");
+  macular.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = macular;
+  ctx.fillRect(0, 0, size, size);
+
+  // Foveal reflex — tiny bright highlight at the centre of the macula
+  const fovea = ctx.createRadialGradient(mX, mY, 0, mX, mY, size * 0.022);
+  fovea.addColorStop(0, "rgba(255,200,160,0.75)");
+  fovea.addColorStop(1, "rgba(255,200,160,0)");
+  ctx.fillStyle = fovea;
+  ctx.fillRect(0, 0, size, size);
+
+  // Optic disc — pale yellowish oval nasal to centre
+  const dX = cx - size * 0.18,
+    dY = cy;
+  const disc = ctx.createRadialGradient(dX, dY, 0, dX, dY, size * 0.065);
+  disc.addColorStop(0, "#e8c890");
+  disc.addColorStop(0.5, "#d4a060");
+  disc.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = disc;
+  ctx.fillRect(0, 0, size, size);
+
+  // Vascular tree — major arcades radiating from the disc
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+
+  function vessel(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    width: number,
+    branches: number,
+    depth: number,
+  ) {
+    if (depth < 0 || width < 0.4) return;
+    ctx.strokeStyle = `rgba(${60 + depth * 8}, 10, 5, ${0.55 - depth * 0.06})`;
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    const mx = (x1 + x2) / 2 + (rng() - 0.5) * size * 0.06;
+    const my = (y1 + y2) / 2 + (rng() - 0.5) * size * 0.06;
+    ctx.quadraticCurveTo(mx, my, x2, y2);
+    ctx.stroke();
+    if (branches > 0) {
+      const offset = size * (0.06 + rng() * 0.08);
+      vessel(
+        x2,
+        y2,
+        x2 + (rng() - 0.5) * offset * 2,
+        y2 - offset,
+        width * 0.68,
+        branches - 1,
+        depth - 1,
+      );
+      vessel(
+        x2,
+        y2,
+        x2 + (rng() - 0.5) * offset * 2,
+        y2 + offset,
+        width * 0.62,
+        branches - 1,
+        depth - 1,
+      );
+    }
+  }
+
+  // Superior arcade — sweeps up and temporal from disc
+  vessel(dX, dY, cx, cy - size * 0.28, 3.5, 3, 4);
+  vessel(dX, dY, cx + size * 0.1, cy - size * 0.22, 3.0, 3, 4);
+  // Inferior arcade — sweeps down and temporal
+  vessel(dX, dY, cx, cy + size * 0.28, 3.5, 3, 4);
+  vessel(dX, dY, cx + size * 0.1, cy + size * 0.22, 3.0, 3, 4);
+  // Nasal vessels — shorter, more radial
+  vessel(dX, dY, dX - size * 0.2, dY - size * 0.12, 2.2, 2, 3);
+  vessel(dX, dY, dX - size * 0.2, dY + size * 0.12, 2.2, 2, 3);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
 /**
- * Retina: semi-transparent inner layer lining the back of the eyeball.
- * Rendered just inside the sclera with BackSide so it appears as a
- * faint inner surface, simulating the light-sensitive retinal layer.
+ * Retina — semi-transparent inner layer with macula, fovea, optic disc,
+ * and vascular arcade silhouette. Rendered on BackSide so it forms the
+ * warm red-orange background visible through the dilated pupil as the
+ * fundal/red-reflex glow that surgeons use to judge capsule visibility.
  */
 export function Retina() {
   const RETINA_RADIUS = EYEBALL_RADIUS - 0.3;
-  const geometry = useMemo(() => {
-    return new THREE.SphereGeometry(RETINA_RADIUS, 64, 64);
-  }, [RETINA_RADIUS]);
+  const geometry = useMemo(() => new THREE.SphereGeometry(RETINA_RADIUS, 64, 64), []);
+  const texture = useMemo(() => createRetinaTexture(), []);
 
   return (
     <mesh geometry={geometry}>
-      <meshPhysicalMaterial
-        color="#d4a0bc"
+      <meshStandardMaterial
+        map={texture}
         transparent
-        opacity={0.2}
-        roughness={0.7}
-        metalness={0.0}
-        transmission={0.05}
-        thickness={0.5}
-        attenuationColor={new THREE.Color('#e8b0c8')}
-        attenuationDistance={3.0}
+        opacity={0.82}
+        roughness={0.9}
+        metalness={0}
         side={THREE.BackSide}
         depthWrite={false}
-        envMapIntensity={0.3}
       />
     </mesh>
   );

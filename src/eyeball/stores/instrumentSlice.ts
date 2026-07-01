@@ -1,5 +1,5 @@
-import type { StateCreator } from 'zustand';
-import type { SimulationState } from './simulationStore';
+import type { StateCreator } from "zustand";
+import type { SimulationState } from "./simulationStore";
 import {
   Instrument,
   Keratome,
@@ -11,8 +11,8 @@ import {
   Vitrector,
   Endolaser,
   MicroForceps,
-} from '../../../packages/instrument-engine/src';
-import type { InstrumentType } from '../../../packages/instrument-engine/src/types/instrument';
+} from "../../../packages/instrument-engine/src";
+import type { InstrumentType } from "../../../packages/instrument-engine/src/types/instrument";
 
 export interface InstrumentSlice {
   currentInstrument: Instrument | null;
@@ -37,7 +37,10 @@ const createDefaultInstruments = (): Instrument[] => [
   new MicroForceps(),
 ];
 
-export const createInstrumentSlice: StateCreator<SimulationState, [], [], InstrumentSlice> = (set, get) => {
+export const createInstrumentSlice: StateCreator<SimulationState, [], [], InstrumentSlice> = (
+  set,
+  get,
+) => {
   const defaultInstruments = createDefaultInstruments();
 
   return {
@@ -46,7 +49,7 @@ export const createInstrumentSlice: StateCreator<SimulationState, [], [], Instru
 
     setCurrentInstrument: (type) => {
       const instruments = get().availableInstruments;
-      const found = instruments.find(i => i.getType() === type);
+      const found = instruments.find((i) => i.getType() === type);
       if (found) {
         // Deactivate previous instrument
         const previous = get().currentInstrument;

@@ -1,5 +1,5 @@
-import { useSimulationStore } from '../../stores/simulationStore';
-import { microscope } from '../../../../packages/microscope-engine/src/Microscope';
+import { useSimulationStore } from "../../stores/simulationStore";
+import { microscope } from "../../../../packages/microscope-engine/src/Microscope";
 
 /**
  * Lighting setup enhanced with virtual operating microscope illumination (Step 3).
@@ -34,11 +34,7 @@ export function Lighting() {
       />
 
       {/* Oblique / side illumination for surface detail and shadows */}
-      <directionalLight
-        position={[18, 12, 22]}
-        intensity={intensities.oblique}
-        color="#fff5e6"
-      />
+      <directionalLight position={[18, 12, 22]} intensity={intensities.oblique} color="#fff5e6" />
       <directionalLight
         position={[-14, -8, 18]}
         intensity={intensities.oblique * 0.7}
@@ -46,20 +42,12 @@ export function Lighting() {
       />
 
       {/* Fill light */}
-      <pointLight
-        position={[5, 5, 15]}
-        intensity={0.25}
-        color="#aaccff"
-      />
+      <pointLight position={[5, 5, 15]} intensity={0.25} color="#aaccff" />
 
       {/* Rim / back light — outlines the sphere's silhouette against the background,
           the classic third point of 3-point lighting that makes a sphere read as
           a sphere instead of a flat, front-lit disc. */}
-      <directionalLight
-        position={[-6, 10, -20]}
-        intensity={0.35}
-        color="#cfe8ff"
-      />
+      <directionalLight position={[-6, 10, -20]} intensity={0.35} color="#cfe8ff" />
 
       {/* Subtle red reflex contribution (retina glow when coaxial light is strong) */}
       {intensities.redReflex > 0.3 && (

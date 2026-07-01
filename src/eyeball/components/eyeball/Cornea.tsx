@@ -1,9 +1,9 @@
-import * as THREE from 'three';
-import { useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { EYEBALL_RADIUS, COLORS } from '../../constants';
-import { useSimulationStore } from '../../stores/simulationStore';
-import { microscope } from '../../../../packages/microscope-engine/src/Microscope';
+import * as THREE from "three";
+import { useMemo, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import { EYEBALL_RADIUS, COLORS } from "../../constants";
+import { useSimulationStore } from "../../stores/simulationStore";
+import { microscope } from "../../../../packages/microscope-engine/src/Microscope";
 
 /**
  * Seeded PRNG for deterministic iris texture.
@@ -28,17 +28,17 @@ function createIrisRng(seed: number) {
 function createIrisTexture(): THREE.CanvasTexture {
   const width = 1024;
   const height = 384;
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
-  const rawCtx = canvas.getContext('2d');
+  const rawCtx = canvas.getContext("2d");
   if (!rawCtx) return new THREE.CanvasTexture(canvas);
   const ctx: CanvasRenderingContext2D = rawCtx;
 
   const rng = createIrisRng(123);
 
   const rgba = (r: number, g: number, b: number, a: number) =>
-    'rgba(' + r.toFixed(0) + ', ' + g.toFixed(0) + ', ' + b.toFixed(0) + ', ' + a.toFixed(3) + ')';
+    "rgba(" + r.toFixed(0) + ", " + g.toFixed(0) + ", " + b.toFixed(0) + ", " + a.toFixed(3) + ")";
 
   // ── Base color: warm hazel-blue, with sectoral heterochromia patches ──────
   // Real irises are rarely a flat single hue — even predominantly blue eyes
@@ -102,7 +102,7 @@ function createIrisTexture(): THREE.CanvasTexture {
     }
     ctx.strokeStyle = rgba(fr, fg, fb, fAlpha);
     ctx.lineWidth = fiberWidth;
-    ctx.lineCap = 'round';
+    ctx.lineCap = "round";
     ctx.stroke();
   }
 
@@ -115,7 +115,8 @@ function createIrisTexture(): THREE.CanvasTexture {
   for (let x = 0; x <= width; x += 4) {
     const wobble = (Math.sin(x * 0.045) + Math.sin(x * 0.11 + 3) * 0.5) * collaretteAmplitude;
     const y = collaretteBaseY + wobble + (rng() - 0.5) * 3;
-    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    if (x === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
   }
   ctx.strokeStyle = rgba(110, 150, 200, 0.28);
   ctx.lineWidth = 5;
@@ -125,7 +126,8 @@ function createIrisTexture(): THREE.CanvasTexture {
   for (let x = 0; x <= width; x += 4) {
     const wobble = (Math.sin(x * 0.045) + Math.sin(x * 0.11 + 3) * 0.5) * collaretteAmplitude;
     const y = collaretteBaseY + wobble + height * 0.025;
-    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    if (x === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
   }
   ctx.strokeStyle = rgba(150, 185, 225, 0.18);
   ctx.lineWidth = 8;
@@ -138,7 +140,8 @@ function createIrisTexture(): THREE.CanvasTexture {
     ctx.beginPath();
     for (let x = 0; x <= width; x += 6) {
       const wobble = Math.sin(x * 0.02 + i) * 3 + (rng() - 0.5) * 2;
-      if (x === 0) ctx.moveTo(x, y + wobble); else ctx.lineTo(x, y + wobble);
+      if (x === 0) ctx.moveTo(x, y + wobble);
+      else ctx.lineTo(x, y + wobble);
     }
     ctx.strokeStyle = rgba(20, 35, 65, 0.08 + rng() * 0.06);
     ctx.lineWidth = 1;
@@ -179,15 +182,15 @@ function createIrisTexture(): THREE.CanvasTexture {
   // banded "venetian blind" streaks rather than organic tissue texture.
   // Compositing through a blurred offscreen pass keeps the underlying detail
   // (collarette, crypts, heterochromia) while smoothing fiber edges.
-  const blurCanvas = document.createElement('canvas');
+  const blurCanvas = document.createElement("canvas");
   blurCanvas.width = width;
   blurCanvas.height = height;
-  const blurCtx = blurCanvas.getContext('2d');
+  const blurCtx = blurCanvas.getContext("2d");
   if (blurCtx) {
-    blurCtx.filter = 'blur(1.4px)';
+    blurCtx.filter = "blur(1.4px)";
     blurCtx.drawImage(canvas, 0, 0);
     ctx.clearRect(0, 0, width, height);
-    ctx.filter = 'none';
+    ctx.filter = "none";
     ctx.drawImage(blurCanvas, 0, 0);
   }
 
@@ -214,9 +217,7 @@ const CORNEA_CAP_ANGLE = Math.PI / 3; // 60°
 // Pre-computed limbus values
 const LIMBUS_Z = CORNEA_CENTER_Z + CORNEA_RADIUS_CURVATURE * Math.cos(CORNEA_CAP_ANGLE);
 const CORNEA_EDGE_RADIUS = CORNEA_RADIUS_CURVATURE * Math.sin(CORNEA_CAP_ANGLE);
-const EYEBALL_WIDTH_AT_LIMBUS = Math.sqrt(
-  EYEBALL_RADIUS * EYEBALL_RADIUS - LIMBUS_Z * LIMBUS_Z
-);
+const EYEBALL_WIDTH_AT_LIMBUS = Math.sqrt(EYEBALL_RADIUS * EYEBALL_RADIUS - LIMBUS_Z * LIMBUS_Z);
 export const LIMBUS_RADIUS = (CORNEA_EDGE_RADIUS + EYEBALL_WIDTH_AT_LIMBUS) / 2;
 
 export function Cornea() {
@@ -228,7 +229,7 @@ export function Cornea() {
       0,
       Math.PI * 2,
       0,
-      CORNEA_CAP_ANGLE
+      CORNEA_CAP_ANGLE,
     );
     geo.rotateX(-Math.PI / 2);
     return geo;
@@ -246,7 +247,7 @@ export function Cornea() {
         clearcoatRoughness={0.008}
         transmission={0.97}
         thickness={3.5}
-        attenuationColor={new THREE.Color('#f0f8ff')}
+        attenuationColor={new THREE.Color("#f0f8ff")}
         attenuationDistance={15.0}
         side={THREE.DoubleSide}
         ior={1.376}
@@ -269,17 +270,17 @@ export function Cornea() {
  */
 function createCatchlightTexture(): THREE.CanvasTexture {
   const size = 128;
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = size;
   canvas.height = size;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
   if (!ctx) return new THREE.CanvasTexture(canvas);
 
   const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-  grad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
-  grad.addColorStop(0.35, 'rgba(255, 255, 255, 0.55)');
-  grad.addColorStop(0.7, 'rgba(255, 255, 255, 0.12)');
-  grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+  grad.addColorStop(0, "rgba(255, 255, 255, 0.95)");
+  grad.addColorStop(0.35, "rgba(255, 255, 255, 0.55)");
+  grad.addColorStop(0.7, "rgba(255, 255, 255, 0.12)");
+  grad.addColorStop(1, "rgba(255, 255, 255, 0)");
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, size, size);
 
@@ -296,19 +297,15 @@ export function CorneaCatchlight() {
   const offsetX = -1.6;
   const offsetY = 1.9;
   const r = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
-  const z = CORNEA_CENTER_Z + Math.sqrt(
-    Math.max(0, CORNEA_RADIUS_CURVATURE * CORNEA_RADIUS_CURVATURE - r * r)
-  ) + 0.05; // tiny epsilon forward so it never z-fights the cornea surface
+  const z =
+    CORNEA_CENTER_Z +
+    Math.sqrt(Math.max(0, CORNEA_RADIUS_CURVATURE * CORNEA_RADIUS_CURVATURE - r * r)) +
+    0.05; // tiny epsilon forward so it never z-fights the cornea surface
 
   return (
     <mesh position={[offsetX, offsetY, z]}>
       <planeGeometry args={[2.6, 2.6]} />
-      <meshBasicMaterial
-        map={texture}
-        transparent
-        depthWrite={false}
-        toneMapped={false}
-      />
+      <meshBasicMaterial map={texture} transparent depthWrite={false} toneMapped={false} />
     </mesh>
   );
 }
@@ -343,20 +340,21 @@ export function Iris() {
   // Surgical mydriasis: pupil ~7-8 mm on a 24 mm (12 mm radius) globe
   // = 7.5/12 = 0.625 of the eyeball radius, which is 0.625/0.38 ≈ 0.86 of iris outer.
   // Use 0.86 so the iris ring is a narrow coloured annulus, not a thick band.
-  const PUPIL_RADIUS      = IRIS_OUTER_RADIUS * 0.86;
-  const IRIS_Z            = EYEBALL_RADIUS - 0.5;
+  const PUPIL_RADIUS = IRIS_OUTER_RADIUS * 0.86;
+  const IRIS_Z = EYEBALL_RADIUS - 0.5;
 
   const irisRingRef = useRef<THREE.Mesh>(null);
   const pupilMeshRef = useRef<THREE.Mesh>(null);
-  const pupilMatRef  = useRef<THREE.MeshPhysicalMaterial>(null);
+  const pupilMatRef = useRef<THREE.MeshPhysicalMaterial>(null);
 
   const irisTexture = useMemo(() => createIrisTexture(), []);
 
   // Pre-build geometries sized to the final dilated state — no animation needed.
-  const irisRingGeometry = useMemo(() =>
-    new THREE.RingGeometry(PUPIL_RADIUS, IRIS_OUTER_RADIUS, 128), []);
-  const pupilGeometry = useMemo(() =>
-    new THREE.CircleGeometry(PUPIL_RADIUS, 96), []);
+  const irisRingGeometry = useMemo(
+    () => new THREE.RingGeometry(PUPIL_RADIUS, IRIS_OUTER_RADIUS, 128),
+    [],
+  );
+  const pupilGeometry = useMemo(() => new THREE.CircleGeometry(PUPIL_RADIUS, 96), []);
 
   useFrame(() => {
     if (!pupilMatRef.current) return;
@@ -364,7 +362,7 @@ export function Iris() {
     const rrIntensity = microscope.getLightIntensities().redReflex;
     const glow = Math.max(0, rrIntensity - 0.15) * 0.6;
     pupilMatRef.current.emissiveIntensity = glow;
-    pupilMatRef.current.opacity = Math.max(0.45, 0.90 - glow * 0.55);
+    pupilMatRef.current.opacity = Math.max(0.45, 0.9 - glow * 0.55);
     pupilMatRef.current.needsUpdate = true;
   });
 
@@ -381,7 +379,7 @@ export function Iris() {
           metalness={0.03}
           transmission={0.1}
           thickness={0.6}
-          attenuationColor={new THREE.Color('#3a70b0')}
+          attenuationColor={new THREE.Color("#3a70b0")}
           attenuationDistance={2.0}
           clearcoat={0.25}
           clearcoatRoughness={0.25}
@@ -393,18 +391,14 @@ export function Iris() {
 
       {/* Pupil disc — dark, semi-transparent to show red-reflex fundal glow.
           Sized to PUPIL_RADIUS, exactly matching the iris ring inner hole. */}
-      <mesh
-        ref={pupilMeshRef}
-        geometry={pupilGeometry}
-        position={[0, 0, IRIS_Z - 0.02]}
-      >
+      <mesh ref={pupilMeshRef} geometry={pupilGeometry} position={[0, 0, IRIS_Z - 0.02]}>
         <meshPhysicalMaterial
           ref={pupilMatRef}
           color="#04040e"
-          emissive={new THREE.Color('#bb1f00')}
+          emissive={new THREE.Color("#bb1f00")}
           emissiveIntensity={0}
           transparent
-          opacity={0.90}
+          opacity={0.9}
           roughness={0.8}
           metalness={0.0}
           transmission={0.14}
@@ -448,7 +442,7 @@ export function LimbusRing() {
         clearcoatRoughness={0.15}
         transmission={0.2}
         thickness={1.0}
-        attenuationColor={new THREE.Color('#c0d8ee')}
+        attenuationColor={new THREE.Color("#c0d8ee")}
         attenuationDistance={4.0}
         envMapIntensity={0.8}
         depthWrite={false}
@@ -467,16 +461,20 @@ export { LIMBUS_Z };
 const RHEXIS_RADIUS = EYEBALL_RADIUS * 0.205; // ≈ 5.5 mm
 
 export function CapsulorhexisGuide() {
-  const currentStep      = useSimulationStore((s) => s.currentCurriculumStep);
+  const currentStep = useSimulationStore((s) => s.currentCurriculumStep);
   const procedureStarted = useSimulationStore((s) => s.procedureStarted);
-  const selectedProc     = useSimulationStore((s) => s.selectedProcedure);
-  const matRef           = useRef<THREE.MeshBasicMaterial>(null);
+  const selectedProc = useSimulationStore((s) => s.selectedProcedure);
+  const matRef = useRef<THREE.MeshBasicMaterial>(null);
 
-  const visible = selectedProc === 'cataract' && procedureStarted && currentStep === 'capsulorhexis';
+  const visible =
+    selectedProc === "cataract" && procedureStarted && currentStep === "capsulorhexis";
 
   useFrame(({ clock }) => {
     if (!matRef.current) return;
-    if (!visible) { matRef.current.opacity = 0; return; }
+    if (!visible) {
+      matRef.current.opacity = 0;
+      return;
+    }
     matRef.current.opacity = 0.38 + Math.sin(clock.elapsedTime * 2.8) * 0.12;
   });
 
@@ -490,6 +488,51 @@ export function CapsulorhexisGuide() {
         transparent
         opacity={0}
         depthTest={false}
+        depthWrite={false}
+      />
+    </mesh>
+  );
+}
+
+/**
+ * AqueousHumour — subtle animated shimmer in the anterior chamber.
+ *
+ * The anterior chamber (between cornea and iris) is filled with a clear
+ * fluid (aqueous humour). Under the surgical microscope this reads as a
+ * faint liquid "depth" behind the corneal dome, distinct from the iris
+ * surface sitting further back. Modelled as a very thin, animated disc
+ * just inside the corneal cap with a slow ripple effect on emissive
+ * intensity — enough to break the "flat painted circle" look of the
+ * cornea/iris stack without drawing attention to itself.
+ */
+export function AqueousHumour() {
+  const matRef = useRef<THREE.MeshPhysicalMaterial>(null);
+
+  useFrame(({ clock }) => {
+    if (!matRef.current) return;
+    const t = clock.elapsedTime;
+    // Very slow, low-amplitude shimmer — liquid depth cue, not a spotlight
+    matRef.current.emissiveIntensity =
+      0.018 + Math.sin(t * 0.4) * 0.008 + Math.sin(t * 0.7 + 1.2) * 0.005;
+  });
+
+  const geo = useMemo(() => new THREE.CircleGeometry(LIMBUS_RADIUS * 0.95, 80), []);
+
+  return (
+    <mesh geometry={geo} position={[0, 0, EYEBALL_RADIUS - 2.8]}>
+      <meshPhysicalMaterial
+        ref={matRef}
+        color="#b8d8f0"
+        emissive={new THREE.Color("#88b8e0")}
+        emissiveIntensity={0.018}
+        transparent
+        opacity={0.08}
+        roughness={0.0}
+        metalness={0}
+        transmission={0.92}
+        thickness={2.0}
+        clearcoat={1.0}
+        clearcoatRoughness={0.0}
         depthWrite={false}
       />
     </mesh>

@@ -1,12 +1,12 @@
-import { useSimulationStore } from '../../stores/simulationStore';
-import { MODE_DISPLAY, MODE_HINT } from '../../constants/terminology';
+import { useSimulationStore } from "../../stores/simulationStore";
+import { MODE_DISPLAY, MODE_HINT } from "../../constants/terminology";
 
 const PHASE_COLOR: Record<string, string> = {
-  IDLE:       'text-gray-400 border-gray-500/40 bg-gray-800/70',
-  CONTACT:    'text-blue-300 border-blue-500/40 bg-blue-950/70',
-  INSERTING:  'text-green-300 border-green-500/40 bg-green-950/70',
-  WITHDRAWING:'text-amber-300 border-amber-500/40 bg-amber-950/70',
-  COMPLETE:   'text-emerald-300 border-emerald-500/40 bg-emerald-950/70',
+  IDLE: "text-gray-400 border-gray-500/40 bg-gray-800/70",
+  CONTACT: "text-blue-300 border-blue-500/40 bg-blue-950/70",
+  INSERTING: "text-green-300 border-green-500/40 bg-green-950/70",
+  WITHDRAWING: "text-amber-300 border-amber-500/40 bg-amber-950/70",
+  COMPLETE: "text-emerald-300 border-emerald-500/40 bg-emerald-950/70",
 };
 
 /**
@@ -16,12 +16,12 @@ const PHASE_COLOR: Record<string, string> = {
  */
 export function SurgicalStatusBar() {
   const phase = useSimulationStore((s) => s.phase);
-  const mode  = useSimulationStore((s) => s.mode);
+  const mode = useSimulationStore((s) => s.mode);
 
-  if (phase === 'COMPLETE') return null;
+  if (phase === "COMPLETE") return null;
 
   const phaseClass = PHASE_COLOR[phase] ?? PHASE_COLOR.IDLE;
-  const hint       = MODE_HINT[mode]  ?? '';
+  const hint = MODE_HINT[mode] ?? "";
 
   return (
     <div className="pointer-events-none fixed bottom-4 left-4 z-40 flex items-center gap-2">

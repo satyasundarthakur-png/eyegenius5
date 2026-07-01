@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
-import { MAX_INSERTION_DEPTH, MAX_TILT_ANGLE } from '../constants';
-import { useSimulationStore } from '../stores/simulationStore';
+import { useMemo } from "react";
+import { MAX_INSERTION_DEPTH, MAX_TILT_ANGLE } from "../constants";
+import { useSimulationStore } from "../stores/simulationStore";
 
 /**
  * Simulated contact force (0-1), combining insertion depth ratio (60% weight)

@@ -1,10 +1,10 @@
-import { useRef } from 'react';
-import { type ThreeEvent } from '@react-three/fiber';
-import { useSimulationStore } from '../stores/simulationStore';
-import { computeRCMFromRay } from '../lib/rcm';
-import { EYEBALL_RADIUS, MAX_INSERTION_DEPTH, MAX_TILT_ANGLE } from '../constants';
-import { useActionLogger } from './useActionLogger';
-import type { Vec3 } from '../types';
+import { useRef } from "react";
+import { type ThreeEvent } from "@react-three/fiber";
+import { useSimulationStore } from "../stores/simulationStore";
+import { computeRCMFromRay } from "../lib/rcm";
+import { EYEBALL_RADIUS, MAX_INSERTION_DEPTH, MAX_TILT_ANGLE } from "../constants";
+import { useActionLogger } from "./useActionLogger";
+import type { Vec3 } from "../types";
 
 /**
  * Handles mouse/pointer interaction on the eyeball, gated by simulation mode:
@@ -32,7 +32,7 @@ export function useMouseControl() {
   const currentRCMIndex = useSimulationStore((s) => s.currentRCMIndex);
 
   function handleClick(e: ThreeEvent<MouseEvent>) {
-    if (mode !== 'PLACE') return;
+    if (mode !== "PLACE") return;
 
     const rayOrigin: Vec3 = [e.ray.origin.x, e.ray.origin.y, e.ray.origin.z];
     const rayDir: Vec3 = [e.ray.direction.x, e.ray.direction.y, e.ray.direction.z];
@@ -40,7 +40,7 @@ export function useMouseControl() {
     if (!result) return;
 
     e.stopPropagation();
-    logAction('RCM_PLACED', {
+    logAction("RCM_PLACED", {
       point: result.rcmPoint,
       normal: result.surfaceNormal,
     });
@@ -49,14 +49,14 @@ export function useMouseControl() {
 
   function handlePointerDown(e: ThreeEvent<PointerEvent>) {
     // EDIT mode: drag to adjust tilt angles
-    if (mode === 'EDIT' && rcmPointSet && e.button === 0) {
+    if (mode === "EDIT" && rcmPointSet && e.button === 0) {
       isDragging.current = true;
       lastMouse.current = { x: e.clientX, y: e.clientY };
       return;
     }
 
     // PLACE mode with existing RCM: start dragging RCM point
-    if (mode === 'PLACE' && rcmPointSet && e.button === 0) {
+    if (mode === "PLACE" && rcmPointSet && e.button === 0) {
       isDraggingRCM.current = true;
       setIsDraggingRCM(true);
       lastMouse.current = { x: e.clientX, y: e.clientY };
@@ -72,7 +72,7 @@ export function useMouseControl() {
     //       drag DOWN (+dy) = push needle deeper
     //       drag UP   (-dy) = retract needle
     // tiltAlpha (elevation) is set via keyboard presets 1-4 or the ControlPanel slider.
-    if (mode === 'EDIT' && isDragging.current && rcmPointSet) {
+    if (mode === "EDIT" && isDragging.current && rcmPointSet) {
       const dx = e.clientX - lastMouse.current.x;
       const dy = e.clientY - lastMouse.current.y;
       lastMouse.current = { x: e.clientX, y: e.clientY };
@@ -83,16 +83,13 @@ export function useMouseControl() {
 
       // Insertion depth — 0.12 mm/px gives ~150 px for full 18 mm range
       const currentDepth = useSimulationStore.getState().insertionDepth;
-      const newDepth = Math.max(
-        0,
-        Math.min(currentDepth + dy * 0.12, MAX_INSERTION_DEPTH)
-      );
+      const newDepth = Math.max(0, Math.min(currentDepth + dy * 0.12, MAX_INSERTION_DEPTH));
       setInsertionDepth(newDepth);
       return;
     }
 
     // PLACE mode: dragging moves RCM point
-    if (mode === 'PLACE' && isDraggingRCM.current) {
+    if (mode === "PLACE" && isDraggingRCM.current) {
       e.stopPropagation();
       const rayOrigin: Vec3 = [e.ray.origin.x, e.ray.origin.y, e.ray.origin.z];
       const rayDir: Vec3 = [e.ray.direction.x, e.ray.direction.y, e.ray.direction.z];
@@ -126,7 +123,7 @@ export function useMouseControl() {
   }
 
   function handleWheel(e: ThreeEvent<WheelEvent>) {
-    if (mode !== 'EDIT' || !rcmPointSet) return;
+    if (mode !== "EDIT" || !rcmPointSet) return;
     e.stopPropagation();
     const delta = e.deltaY > 0 ? -0.5 : 0.5;
     const current = useSimulationStore.getState().insertionDepth;

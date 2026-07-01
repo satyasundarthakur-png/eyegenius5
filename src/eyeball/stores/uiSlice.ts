@@ -1,5 +1,5 @@
-import type { StateCreator } from 'zustand';
-import type { SimulationState } from './simulationStore';
+import type { StateCreator } from "zustand";
+import type { SimulationState } from "./simulationStore";
 
 export interface UISlice {
   /** Whether the HUD panel sidebars + 3-D coordinate labels are visible.
@@ -11,6 +11,10 @@ export interface UISlice {
 
 export const createUISlice: StateCreator<SimulationState, [], [], UISlice> = (set, get) => ({
   showHUD: false,
-  setShowHUD: (v) => { set({ showHUD: v }); },
-  toggleHUD: () => { set({ showHUD: !get().showHUD }); },
+  setShowHUD: (v) => {
+    set({ showHUD: v });
+  },
+  toggleHUD: () => {
+    set({ showHUD: !get().showHUD });
+  },
 });

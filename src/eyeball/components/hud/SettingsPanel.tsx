@@ -1,30 +1,30 @@
-import { useState, useRef, useEffect } from 'react';
-import { useSimulationStore } from '../../stores/simulationStore';
-import { useThemeStore } from '../../stores/themeStore';
-import { useKeyBindingsStore, DEFAULT_KEYBINDINGS } from '../../stores/keyBindingsStore';
-import type { KeyBindings } from '../../stores/keyBindingsStore';
+import { useState, useRef, useEffect } from "react";
+import { useSimulationStore } from "../../stores/simulationStore";
+import { useThemeStore } from "../../stores/themeStore";
+import { useKeyBindingsStore, DEFAULT_KEYBINDINGS } from "../../stores/keyBindingsStore";
+import type { KeyBindings } from "../../stores/keyBindingsStore";
 
 interface SettingsPanelProps {
   onClose: () => void;
 }
 
 const ACTION_LABELS: Record<keyof KeyBindings, string> = {
-  modeView: 'VIEW Mode',
-  modePlace: 'PLACE Mode',
-  modeEdit: 'EDIT Mode',
-  modeReplay: 'REPLAY Mode',
-  insertUp: 'Insert (depth +)',
-  withdrawDown: 'Withdraw (depth −)',
-  rotateLeft: 'Rotate Left',
-  rotateRight: 'Rotate Right',
-  preset1: 'Preset 0°',
-  preset2: 'Preset 15°',
-  preset3: 'Preset 30°',
-  preset4: 'Preset 45°',
-  reset: 'Reset Simulation',
-  clearTrails: 'Clear Trails',
-  undo: 'Undo',
-  redo: 'Redo',
+  modeView: "VIEW Mode",
+  modePlace: "PLACE Mode",
+  modeEdit: "EDIT Mode",
+  modeReplay: "REPLAY Mode",
+  insertUp: "Insert (depth +)",
+  withdrawDown: "Withdraw (depth −)",
+  rotateLeft: "Rotate Left",
+  rotateRight: "Rotate Right",
+  preset1: "Preset 0°",
+  preset2: "Preset 15°",
+  preset3: "Preset 30°",
+  preset4: "Preset 45°",
+  reset: "Reset Simulation",
+  clearTrails: "Clear Trails",
+  undo: "Undo",
+  redo: "Redo",
 };
 
 function KeyBindingRow({ bindingKey }: { bindingKey: keyof KeyBindings }) {
@@ -39,12 +39,14 @@ function KeyBindingRow({ bindingKey }: { bindingKey: keyof KeyBindings }) {
     function handleKeyDown(e: KeyboardEvent) {
       e.preventDefault();
       e.stopPropagation();
-      const key = e.key === ' ' ? ' ' : e.key;
+      const key = e.key === " " ? " " : e.key;
       setKeyBinding(bindingKey, key);
       setIsListening(false);
     }
-    window.addEventListener('keydown', handleKeyDown);
-    return () => { window.removeEventListener('keydown', handleKeyDown); };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [isListening, bindingKey, setKeyBinding]);
 
   useEffect(() => {
@@ -53,23 +55,27 @@ function KeyBindingRow({ bindingKey }: { bindingKey: keyof KeyBindings }) {
       if (rowRef.current && !rowRef.current.contains(e.target as Node)) {
         setIsListening(false);
       }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
     };
-    document.addEventListener('mousedown', handleClick);
-    return () => { document.removeEventListener('mousedown', handleClick); };
   }, [isListening]);
 
   return (
     <div ref={rowRef} className="flex items-center justify-between py-1.5">
       <span className="text-xs text-blue-200/80">{ACTION_LABELS[bindingKey]}</span>
       <button
-        onClick={() => { setIsListening(!isListening); }}
+        onClick={() => {
+          setIsListening(!isListening);
+        }}
         className={`min-w-[60px] rounded border px-2 py-1 text-xs font-mono transition-all ${
           isListening
-            ? 'border-amber-500/60 bg-amber-500/20 text-amber-300 animate-pulse'
-            : 'border-blue-500/20 bg-blue-500/10 text-blue-200 hover:border-blue-500/40 hover:bg-blue-500/20'
+            ? "border-amber-500/60 bg-amber-500/20 text-amber-300 animate-pulse"
+            : "border-blue-500/20 bg-blue-500/10 text-blue-200 hover:border-blue-500/40 hover:bg-blue-500/20"
         }`}
       >
-        {isListening ? '...' : currentKey}
+        {isListening ? "..." : currentKey}
       </button>
     </div>
   );
@@ -109,21 +115,25 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
             </div>
             <div className="flex gap-2">
               <button
-                onClick={() => { setTheme('dark'); }}
+                onClick={() => {
+                  setTheme("dark");
+                }}
                 className={`rounded border px-3 py-1.5 text-xs transition-all ${
-                  theme === 'dark'
-                    ? 'border-blue-500/60 bg-blue-500/30 text-blue-100'
-                    : 'border-blue-500/20 bg-blue-500/10 text-blue-300/70 hover:bg-blue-500/20'
+                  theme === "dark"
+                    ? "border-blue-500/60 bg-blue-500/30 text-blue-100"
+                    : "border-blue-500/20 bg-blue-500/10 text-blue-300/70 hover:bg-blue-500/20"
                 }`}
               >
                 🌙 Dark
               </button>
               <button
-                onClick={() => { setTheme('light'); }}
+                onClick={() => {
+                  setTheme("light");
+                }}
                 className={`rounded border px-3 py-1.5 text-xs transition-all ${
-                  theme === 'light'
-                    ? 'border-amber-500/60 bg-amber-500/30 text-amber-100'
-                    : 'border-amber-500/20 bg-amber-500/10 text-amber-300/70 hover:bg-amber-500/20'
+                  theme === "light"
+                    ? "border-amber-500/60 bg-amber-500/30 text-amber-100"
+                    : "border-amber-500/20 bg-amber-500/10 text-amber-300/70 hover:bg-amber-500/20"
                 }`}
               >
                 ☀️ Light
@@ -142,9 +152,11 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
               max={0.8}
               step={0.05}
               value={corneaOpacity}
-              onChange={(e) => { setCorneaOpacity(parseFloat(e.target.value)); }}
+              onChange={(e) => {
+                setCorneaOpacity(parseFloat(e.target.value));
+              }}
               className="w-full accent-blue-500 [&::-webkit-slider-thumb]:cursor-pointer"
-              disabled={mode !== 'VIEW'}
+              disabled={mode !== "VIEW"}
             />
             <p className="mt-1 text-xs text-blue-300/60">
               Adjust transparency of the cornea. Changes apply in VIEW mode.
@@ -162,12 +174,12 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
               max={2.0}
               step={0.1}
               value={lightIntensity}
-              onChange={(e) => { setLightIntensity(parseFloat(e.target.value)); }}
+              onChange={(e) => {
+                setLightIntensity(parseFloat(e.target.value));
+              }}
               className="w-full accent-blue-500 [&::-webkit-slider-thumb]:cursor-pointer"
             />
-            <p className="mt-1 text-xs text-blue-300/60">
-              Adjust scene lighting intensity.
-            </p>
+            <p className="mt-1 text-xs text-blue-300/60">Adjust scene lighting intensity.</p>
           </div>
 
           {/* Visibility Toggles */}
@@ -178,7 +190,9 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
               <input
                 type="checkbox"
                 checked={showSafetyCone}
-                onChange={(e) => { setShowSafetyCone(e.target.checked); }}
+                onChange={(e) => {
+                  setShowSafetyCone(e.target.checked);
+                }}
                 className="accent-blue-500"
               />
               <span className="text-sm text-blue-200">Show Safety Cone (max tilt)</span>
@@ -188,7 +202,9 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
               <input
                 type="checkbox"
                 checked={showNormalIndicator}
-                onChange={(e) => { setShowNormalIndicator(e.target.checked); }}
+                onChange={(e) => {
+                  setShowNormalIndicator(e.target.checked);
+                }}
                 className="accent-blue-500"
               />
               <span className="text-sm text-blue-200">Show Normal Indicator</span>
@@ -198,11 +214,13 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
           {/* Keyboard Shortcuts */}
           <div>
             <button
-              onClick={() => { setShowKeybindings(!showKeybindings); }}
+              onClick={() => {
+                setShowKeybindings(!showKeybindings);
+              }}
               className="flex w-full items-center justify-between rounded border border-blue-500/15 bg-blue-500/5 px-3 py-2 text-sm text-blue-100 hover:bg-blue-500/10"
             >
               <span>Keyboard Shortcuts</span>
-              <span className="text-xs text-blue-300/60">{showKeybindings ? '▾' : '▸'}</span>
+              <span className="text-xs text-blue-300/60">{showKeybindings ? "▾" : "▸"}</span>
             </button>
             {showKeybindings && (
               <div className="mt-2 rounded border border-blue-500/15 bg-blue-500/5 px-3 py-2">

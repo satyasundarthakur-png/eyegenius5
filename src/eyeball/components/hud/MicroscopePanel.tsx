@@ -1,5 +1,5 @@
-import { useSimulationStore } from '../../stores/simulationStore';
-import { Slider } from '../ui/slider';
+import { useSimulationStore } from "../../stores/simulationStore";
+import { Slider } from "../ui/slider";
 
 export function MicroscopePanel() {
   const microscope = useSimulationStore((s) => s.microscope);
@@ -10,18 +10,18 @@ export function MicroscopePanel() {
   const resetMicroscope = useSimulationStore((s) => s.resetMicroscope);
 
   return (
-    <div className="pointer-events-auto w-56 rounded-lg border border-blue-500/30 bg-gray-950/85 p-3 text-blue-100 backdrop-blur">
+    <div className="text-blue-100">
       <div className="mb-2 flex items-center justify-between border-b border-blue-500/20 pb-1">
         <h3 className="text-xs font-semibold tracking-wider text-blue-400 uppercase">Microscope</h3>
         <button
           onClick={toggleMicroscope}
           className={`rounded px-2 py-0.5 text-[10px] font-semibold uppercase transition-colors ${
             microscope.enabled
-              ? 'bg-green-600 text-white'
-              : 'bg-gray-800 text-gray-400 hover:text-gray-200'
+              ? "bg-green-600 text-white"
+              : "bg-gray-800 text-gray-400 hover:text-gray-200"
           }`}
         >
-          {microscope.enabled ? 'On' : 'Off'}
+          {microscope.enabled ? "On" : "Off"}
         </button>
       </div>
 

@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
-import { useSimulationStore } from '../../stores/simulationStore';
-import { EYEBALL_RADIUS } from '../../constants';
+import { useEffect, useRef } from "react";
+import { useSimulationStore } from "../../stores/simulationStore";
+import { EYEBALL_RADIUS } from "../../constants";
 
 /**
  * 2D top-down minimap showing spatial relationships.
@@ -63,7 +63,7 @@ export function MiniMap() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const scale = 8; // Scale factor
@@ -75,7 +75,7 @@ export function MiniMap() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw background grid
-    ctx.strokeStyle = 'rgba(68, 136, 255, 0.1)';
+    ctx.strokeStyle = "rgba(68, 136, 255, 0.1)";
     ctx.lineWidth = 1;
     for (let i = 0; i < canvas.width; i += 20) {
       ctx.beginPath();
@@ -91,9 +91,9 @@ export function MiniMap() {
     // Draw eyeball circle
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(10, 10, 30, 0.8)';
+    ctx.fillStyle = "rgba(10, 10, 30, 0.8)";
     ctx.fill();
-    ctx.strokeStyle = '#4488ff';
+    ctx.strokeStyle = "#4488ff";
     ctx.lineWidth = 2;
     ctx.stroke();
 
@@ -106,23 +106,23 @@ export function MiniMap() {
       // RCM point marker
       ctx.beginPath();
       ctx.arc(x, y, isCurrent ? 6 : 4, 0, Math.PI * 2);
-      ctx.fillStyle = isCurrent ? '#44ff88' : '#4488ff';
+      ctx.fillStyle = isCurrent ? "#44ff88" : "#4488ff";
       ctx.fill();
-      ctx.strokeStyle = 'white';
+      ctx.strokeStyle = "white";
       ctx.lineWidth = 1;
       ctx.stroke();
 
       // Entry point label
-      ctx.fillStyle = '#93c5fd';
-      ctx.font = '10px sans-serif';
-      ctx.textAlign = 'center';
+      ctx.fillStyle = "#93c5fd";
+      ctx.font = "10px sans-serif";
+      ctx.textAlign = "center";
       ctx.fillText(`E${String(index + 1)}`, x, y - 10);
     });
 
     // Draw trail points
     if (trailPoints.length > 0) {
       ctx.beginPath();
-      ctx.strokeStyle = 'rgba(255, 68, 68, 0.3)';
+      ctx.strokeStyle = "rgba(255, 68, 68, 0.3)";
       ctx.lineWidth = 1;
       trailPoints.forEach((point) => {
         const x = centerX + point[0] * scale;
@@ -143,9 +143,9 @@ export function MiniMap() {
       // Tip position
       ctx.beginPath();
       ctx.arc(x, y, 5, 0, Math.PI * 2);
-      ctx.fillStyle = '#ff6600';
+      ctx.fillStyle = "#ff6600";
       ctx.fill();
-      ctx.strokeStyle = 'white';
+      ctx.strokeStyle = "white";
       ctx.lineWidth = 2;
       ctx.stroke();
 
@@ -157,17 +157,17 @@ export function MiniMap() {
         ctx.beginPath();
         ctx.moveTo(rcmX, rcmY);
         ctx.lineTo(x, y);
-        ctx.strokeStyle = 'rgba(255, 102, 0, 0.6)';
+        ctx.strokeStyle = "rgba(255, 102, 0, 0.6)";
         ctx.lineWidth = 2;
         ctx.stroke();
       }
     }
 
     // Draw scale indicator
-    ctx.fillStyle = '#93c5fd';
-    ctx.font = '10px sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('Scale: 1mm = 8px', 10, canvas.height - 10);
+    ctx.fillStyle = "#93c5fd";
+    ctx.font = "10px sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("Scale: 1mm = 8px", 10, canvas.height - 10);
   }, [
     canvasRef,
     rcmPoints,
@@ -193,7 +193,10 @@ export function MiniMap() {
       />
       <div className="mt-2 flex justify-between text-[10px] text-blue-300/60">
         <span>XY Projection</span>
-        <span>{rcmPoints.length} Entry{rcmPoints.length !== 1 ? '' : ''} Pt{rcmPoints.length !== 1 ? 's' : ''}</span>
+        <span>
+          {rcmPoints.length} Entry{rcmPoints.length !== 1 ? "" : ""} Pt
+          {rcmPoints.length !== 1 ? "s" : ""}
+        </span>
       </div>
     </div>
   );

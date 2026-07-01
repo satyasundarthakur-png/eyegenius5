@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
-import { useSimulationStore } from '../stores/simulationStore';
-import { SurgicalPhase } from '../types';
+import { useEffect, useRef } from "react";
+import { useSimulationStore } from "../stores/simulationStore";
+import { SurgicalPhase } from "../types";
 
 /**
  * Hook that automatically transitions surgical phases based on:

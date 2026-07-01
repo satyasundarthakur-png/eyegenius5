@@ -1,8 +1,8 @@
-import type { StateCreator } from 'zustand';
-import type { SimulationState } from './simulationStore';
-import { biomechanics } from '../../../packages/physics-engine/src';
-import type { LayerId } from '../../../packages/anatomy-engine/types/anatomy';
-import type { Vec3 } from '../types';
+import type { StateCreator } from "zustand";
+import type { SimulationState } from "./simulationStore";
+import { biomechanics } from "../../../packages/physics-engine/src";
+import type { LayerId } from "../../../packages/anatomy-engine/types/anatomy";
+import type { Vec3 } from "../types";
 
 export interface PhysicsSlice {
   physicsEnabled: boolean;
@@ -32,7 +32,9 @@ export const createPhysicsSlice: StateCreator<SimulationState, [], [], PhysicsSl
 
   applyTissueDeformation: (layerId, point, force, intensity = 1.0) => {
     biomechanics.applyDeformation(layerId, point, force, intensity);
-    set({ capsuleDeformationIntensity: biomechanics.getDeformation('lens-capsule')?.intensity ?? 0 });
+    set({
+      capsuleDeformationIntensity: biomechanics.getDeformation("lens-capsule")?.intensity ?? 0,
+    });
   },
 
   startTissueTear: (layerId, point) => {

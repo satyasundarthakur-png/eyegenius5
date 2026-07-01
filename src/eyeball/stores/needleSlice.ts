@@ -1,8 +1,8 @@
-import type { StateCreator } from 'zustand';
-import type { SimulationMode, SurgicalPhase } from '../types';
-import { transitionPhase } from '../lib/phaseMachine';
-import { MAX_INSERTION_DEPTH, MAX_TILT_ANGLE } from '../constants';
-import type { SimulationState } from './simulationStore';
+import type { StateCreator } from "zustand";
+import type { SimulationMode, SurgicalPhase } from "../types";
+import { transitionPhase } from "../lib/phaseMachine";
+import { MAX_INSERTION_DEPTH, MAX_TILT_ANGLE } from "../constants";
+import type { SimulationState } from "./simulationStore";
 
 export interface NeedleSlice {
   mode: SimulationMode;
@@ -19,12 +19,15 @@ export interface NeedleSlice {
   reset: () => void;
 }
 
-export const createNeedleSlice: StateCreator<SimulationState, [], [], NeedleSlice> = (set, get) => ({
-  mode: 'VIEW',
+export const createNeedleSlice: StateCreator<SimulationState, [], [], NeedleSlice> = (
+  set,
+  get,
+) => ({
+  mode: "VIEW",
   tiltAlpha: 0,
   tiltBeta: 0,
   insertionDepth: 0,
-  phase: 'IDLE',
+  phase: "IDLE",
 
   setMode: (mode) => {
     set({ mode });
@@ -33,7 +36,7 @@ export const createNeedleSlice: StateCreator<SimulationState, [], [], NeedleSlic
   setTiltAngles: (tiltAlpha, tiltBeta) => {
     const clampedAlpha = Math.max(-MAX_TILT_ANGLE, Math.min(MAX_TILT_ANGLE, tiltAlpha));
     const { phase } = get();
-    const newPhase = phase === 'CONTACT' ? transitionPhase(phase, 'needleMoved') : phase;
+    const newPhase = phase === "CONTACT" ? transitionPhase(phase, "needleMoved") : phase;
     set({ tiltAlpha: clampedAlpha, tiltBeta, phase: newPhase });
   },
 
@@ -41,10 +44,10 @@ export const createNeedleSlice: StateCreator<SimulationState, [], [], NeedleSlic
     const clamped = Math.max(0, Math.min(insertionDepth, MAX_INSERTION_DEPTH));
     const { phase } = get();
     let newPhase = phase;
-    if (phase === 'CONTACT') {
-      newPhase = transitionPhase(phase, 'needleMoved');
-    } else if (clamped <= 0 && phase === 'INSERTING') {
-      newPhase = transitionPhase(phase, 'depthReturned');
+    if (phase === "CONTACT") {
+      newPhase = transitionPhase(phase, "needleMoved");
+    } else if (clamped <= 0 && phase === "INSERTING") {
+      newPhase = transitionPhase(phase, "depthReturned");
     }
     set({ insertionDepth: clamped, phase: newPhase });
   },
@@ -55,7 +58,7 @@ export const createNeedleSlice: StateCreator<SimulationState, [], [], NeedleSlic
 
   completeSurgery: () => {
     const { phase } = get();
-    const newPhase = transitionPhase(phase, 'completeSurgery');
+    const newPhase = transitionPhase(phase, "completeSurgery");
     if (newPhase !== phase) {
       set({ phase: newPhase });
     }
@@ -64,11 +67,11 @@ export const createNeedleSlice: StateCreator<SimulationState, [], [], NeedleSlic
   reset: () => {
     const { resetMicroscope, clearReplay, setProcedure } = get();
     set({
-      mode: 'VIEW',
+      mode: "VIEW",
       tiltAlpha: 0,
       tiltBeta: 0,
       insertionDepth: 0,
-      phase: 'IDLE',
+      phase: "IDLE",
       // Reset sibling slices
       rcmPoints: [],
       currentRCMIndex: -1,
@@ -90,6 +93,6 @@ export const createNeedleSlice: StateCreator<SimulationState, [], [], NeedleSlic
     // so a fresh attempt doesn't inherit progress/score from the previous one.
     resetMicroscope();
     clearReplay();
-    setProcedure('cataract');
+    setProcedure("cataract");
   },
 });

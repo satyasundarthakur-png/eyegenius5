@@ -1,6 +1,9 @@
-import type { StateCreator } from 'zustand';
-import type { SimulationState } from './simulationStore';
-import { microscope, type MicroscopeState } from '../../../packages/microscope-engine/src/Microscope';
+import type { StateCreator } from "zustand";
+import type { SimulationState } from "./simulationStore";
+import {
+  microscope,
+  type MicroscopeState,
+} from "../../../packages/microscope-engine/src/Microscope";
 
 export interface MicroscopeSlice {
   microscope: MicroscopeState;
@@ -14,7 +17,9 @@ export interface MicroscopeSlice {
   resetMicroscope: () => void;
 }
 
-export const createMicroscopeSlice: StateCreator<SimulationState, [], [], MicroscopeSlice> = (set) => ({
+export const createMicroscopeSlice: StateCreator<SimulationState, [], [], MicroscopeSlice> = (
+  set,
+) => ({
   microscope: microscope.getState(),
 
   setMicroscopeZoom: (zoom) => {

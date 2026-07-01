@@ -1,7 +1,7 @@
-import type { StateCreator } from 'zustand';
-import type { Vec3 } from '../types';
-import { transitionPhase } from '../lib/phaseMachine';
-import type { SimulationState } from './simulationStore';
+import type { StateCreator } from "zustand";
+import type { Vec3 } from "../types";
+import { transitionPhase } from "../lib/phaseMachine";
+import type { SimulationState } from "./simulationStore";
 
 export interface RCMPoint {
   id: string;
@@ -39,12 +39,12 @@ export const createRCMSlice: StateCreator<SimulationState, [], [], RCMSlice> = (
       normal,
     };
     set((state) => {
-      const newPhase = transitionPhase(state.phase, 'placeRCM');
+      const newPhase = transitionPhase(state.phase, "placeRCM");
       return {
         rcmPoints: [...state.rcmPoints, newRCM],
         currentRCMIndex: state.rcmPoints.length,
         phase: newPhase,
-        mode: 'EDIT' as const,
+        mode: "EDIT" as const,
         rcmPoint: point,
         surfaceNormal: normal,
       };
@@ -68,7 +68,7 @@ export const createRCMSlice: StateCreator<SimulationState, [], [], RCMSlice> = (
       return {
         rcmPoints: newRCMPoints,
         currentRCMIndex: finalIndex,
-        phase: newRCMPoints.length === 0 ? 'IDLE' : state.phase,
+        phase: newRCMPoints.length === 0 ? "IDLE" : state.phase,
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         rcmPoint: currentRCM ? currentRCM.point : null,
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

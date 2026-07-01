@@ -1,5 +1,5 @@
-import { useFrame } from '@react-three/fiber';
-import { useSimulationStore } from '../stores/simulationStore';
+import { useFrame } from "@react-three/fiber";
+import { useSimulationStore } from "../stores/simulationStore";
 
 /**
  * useScoringAI (Step 8)

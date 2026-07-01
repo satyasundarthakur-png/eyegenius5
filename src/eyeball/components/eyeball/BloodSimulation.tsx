@@ -1,7 +1,7 @@
-import { useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
-import { useSimulationStore } from '../../stores/simulationStore';
+import { useMemo, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import * as THREE from "three";
+import { useSimulationStore } from "../../stores/simulationStore";
 
 const MAX_PARTICLES = 50;
 
@@ -29,9 +29,9 @@ export function BloodSimulation() {
     const positions = new Float32Array(MAX_PARTICLES * 3);
     const colors = new Float32Array(MAX_PARTICLES * 3);
     const sizes = new Float32Array(MAX_PARTICLES);
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    geo.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
     return geo;
   }, []);
 
@@ -47,7 +47,10 @@ export function BloodSimulation() {
     const spawnRate = Math.min(insertionDepth / 18, 1) * 10; // particles per second
 
     // Spawn new particles
-    if (now - lastSpawnTime.current > 1000 / spawnRate && particles.current.length < MAX_PARTICLES) {
+    if (
+      now - lastSpawnTime.current > 1000 / spawnRate &&
+      particles.current.length < MAX_PARTICLES
+    ) {
       lastSpawnTime.current = now;
       particles.current.push({
         position: new THREE.Vector3(

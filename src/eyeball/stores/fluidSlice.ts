@@ -1,6 +1,6 @@
-import type { StateCreator } from 'zustand';
-import type { SimulationState } from './simulationStore';
-import { fluidics, type FluidicsState } from '../../../packages/fluid-engine/src';
+import type { StateCreator } from "zustand";
+import type { SimulationState } from "./simulationStore";
+import { fluidics, type FluidicsState } from "../../../packages/fluid-engine/src";
 
 export interface FluidSlice {
   fluidics: FluidicsState;

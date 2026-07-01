@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef } from "react";
 
 export type LogEntry = {
   timestamp: number;
@@ -23,8 +23,8 @@ class ActionLogger {
     }
     console.log(
       `[Action] %c${action}`,
-      'color: #4488ff; font-weight: bold',
-      details ? details : ''
+      "color: #4488ff; font-weight: bold",
+      details ? details : "",
     );
   }
 

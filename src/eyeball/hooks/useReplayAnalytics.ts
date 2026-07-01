@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { useSimulationStore } from '../stores/simulationStore';
+import { useEffect } from "react";
+import { useSimulationStore } from "../stores/simulationStore";
 
 /**
  * useReplayAnalytics (Step 9)
@@ -19,7 +19,7 @@ export function useReplayAnalytics() {
   useEffect(() => {
     if (currentInstrument && !isRecording) {
       startReplayRecording(currentInstrument.getType());
-      logSurgicalEvent('SESSION_START', { instrument: currentInstrument.getType() });
+      logSurgicalEvent("SESSION_START", { instrument: currentInstrument.getType() });
     }
   }, [currentInstrument, isRecording, startReplayRecording, logSurgicalEvent]);
 
@@ -27,20 +27,20 @@ export function useReplayAnalytics() {
   useEffect(() => {
     if (complications.length > 0) {
       const last = complications[complications.length - 1];
-      logSurgicalEvent('COMPLICATION', { type: last.type, cause: last.cause });
+      logSurgicalEvent("COMPLICATION", { type: last.type, cause: last.cause });
     }
   }, [complications, logSurgicalEvent]);
 
   // Auto-stop and save when curriculum completes
   useEffect(() => {
-    if (currentStep === 'complete' && isRecording) {
+    if (currentStep === "complete" && isRecording) {
       const session = stopReplayRecording(
         scoring.performance.overall,
         complications.length,
-        currentStep
+        currentStep,
       );
       if (session) {
-        console.log('[Replay] Session saved:', session.id);
+        console.log("[Replay] Session saved:", session.id);
       }
     }
   }, [currentStep, isRecording, stopReplayRecording, scoring, complications]);

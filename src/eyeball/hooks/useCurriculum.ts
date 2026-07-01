@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { useSimulationStore } from '../stores/simulationStore';
+import { useEffect } from "react";
+import { useSimulationStore } from "../stores/simulationStore";
 
 /**
  * useCurriculum (Step 7 — fixed)
@@ -16,24 +16,20 @@ import { useSimulationStore } from '../stores/simulationStore';
  */
 export function useCurriculum() {
   const currentInstrument = useSimulationStore((s) => s.currentInstrument);
-  const insertionDepth    = useSimulationStore((s) => s.insertionDepth);
-  const tiltAlpha         = useSimulationStore((s) => s.tiltAlpha);
+  const insertionDepth = useSimulationStore((s) => s.insertionDepth);
+  const tiltAlpha = useSimulationStore((s) => s.tiltAlpha);
   const validateCurrentCurriculumStep = useSimulationStore((s) => s.validateCurrentCurriculumStep);
-  const currentStep       = useSimulationStore((s) => s.currentCurriculumStep);
+  const currentStep = useSimulationStore((s) => s.currentCurriculumStep);
   const selectedProcedure = useSimulationStore((s) => s.selectedProcedure);
-  const procedureStarted  = useSimulationStore((s) => s.procedureStarted);
+  const procedureStarted = useSimulationStore((s) => s.procedureStarted);
 
   useEffect(() => {
-    if (selectedProcedure !== 'cataract' || !procedureStarted) return;
-    if (!currentInstrument || currentStep === 'complete' || currentStep === 'idle') return;
+    if (selectedProcedure !== "cataract" || !procedureStarted) return;
+    if (!currentInstrument || currentStep === "complete" || currentStep === "idle") return;
 
     // Pass store values directly — instrument pose is also synced by useBiomechanics
     // but we don't want a one-frame lag here; the curriculum only needs type + depth + alpha.
-    validateCurrentCurriculumStep(
-      currentInstrument.getType(),
-      insertionDepth,
-      tiltAlpha,
-    );
+    validateCurrentCurriculumStep(currentInstrument.getType(), insertionDepth, tiltAlpha);
   }, [
     currentInstrument,
     insertionDepth,

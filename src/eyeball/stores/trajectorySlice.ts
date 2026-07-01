@@ -1,6 +1,6 @@
-import type { StateCreator } from 'zustand';
-import type { Vec3, TrailPoint } from '../types';
-import type { SimulationState } from './simulationStore';
+import type { StateCreator } from "zustand";
+import type { Vec3, TrailPoint } from "../types";
+import type { SimulationState } from "./simulationStore";
 
 const MAX_TRAIL_POINTS = 5000;
 const MAX_CHART_POINTS = 100;
@@ -24,7 +24,10 @@ export interface TrajectorySlice {
   advancePlayback: () => void;
 }
 
-export const createTrajectorySlice: StateCreator<SimulationState, [], [], TrajectorySlice> = (set, get) => ({
+export const createTrajectorySlice: StateCreator<SimulationState, [], [], TrajectorySlice> = (
+  set,
+  get,
+) => ({
   trailPoints: [],
   trailData: [],
   chartData: [],

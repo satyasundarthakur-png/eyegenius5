@@ -1,14 +1,14 @@
-import { useSimulationStore } from '../../stores/simulationStore';
-import { useNeedlePose } from '../../hooks/useNeedlePose';
-import { TELEMETRY_PANEL_LABEL, ENTRY_POINT_LABEL } from '../../constants/terminology';
-import { usePhaseTransitionFlash } from '../../hooks/usePhaseTransition';
+import { useSimulationStore } from "../../stores/simulationStore";
+import { useNeedlePose } from "../../hooks/useNeedlePose";
+import { TELEMETRY_PANEL_LABEL, ENTRY_POINT_LABEL } from "../../constants/terminology";
+import { usePhaseTransitionFlash } from "../../hooks/usePhaseTransition";
 
 const phaseColorMap: Record<string, string> = {
-  IDLE: 'text-gray-400',
-  CONTACT: 'text-blue-400',
-  INSERTING: 'text-green-400',
-  WITHDRAWING: 'text-amber-400',
-  COMPLETE: 'text-red-400',
+  IDLE: "text-gray-400",
+  CONTACT: "text-blue-400",
+  INSERTING: "text-green-400",
+  WITHDRAWING: "text-amber-400",
+  COMPLETE: "text-red-400",
 };
 
 export function KinematicsPanel() {
@@ -18,7 +18,7 @@ export function KinematicsPanel() {
   const pose = useNeedlePose();
 
   return (
-    <div className="pointer-events-auto w-full rounded-lg border border-blue-500/30 bg-gray-950/85 p-3 text-blue-100 backdrop-blur sm:min-w-[240px] sm:p-4">
+    <div className="text-blue-100">
       <h3 className="mb-2 border-b border-blue-500/20 pb-1 text-xs font-semibold tracking-wider text-blue-400 uppercase sm:mb-3 sm:text-sm">
         {TELEMETRY_PANEL_LABEL}
       </h3>
@@ -30,11 +30,11 @@ export function KinematicsPanel() {
               <td className="py-1 text-right">
                 <span
                   className={`inline-block rounded px-2 py-0.5 text-[11px] font-semibold tracking-wider transition-all duration-300 ${
-                    phaseColorMap[phase] ?? 'text-blue-100'
+                    phaseColorMap[phase] ?? "text-blue-100"
                   } ${
                     isPhaseTransitioning
-                      ? 'scale-110 shadow-lg shadow-blue-500/50 animate-pulse'
-                      : ''
+                      ? "scale-110 shadow-lg shadow-blue-500/50 animate-pulse"
+                      : ""
                   }`}
                 >
                   {phase}

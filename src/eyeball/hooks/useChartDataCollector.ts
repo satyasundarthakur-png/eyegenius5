@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { useSimulationStore } from '../stores/simulationStore';
+import { useEffect, useRef } from "react";
+import { useSimulationStore } from "../stores/simulationStore";
 
 /**
  * Hook that collects chart data points when insertion depth changes.
@@ -21,7 +21,7 @@ export function useChartDataCollector() {
 
   useEffect(() => {
     // Only collect in EDIT mode
-    if (mode !== 'EDIT') return;
+    if (mode !== "EDIT") return;
 
     // Only collect when depth actually changes
     if (Math.abs(insertionDepth - lastDepthRef.current) < 0.1) return;

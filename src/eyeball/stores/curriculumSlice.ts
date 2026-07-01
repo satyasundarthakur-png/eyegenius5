@@ -1,6 +1,11 @@
-import type { StateCreator } from 'zustand';
-import type { SimulationState } from './simulationStore';
-import { cataractCurriculum, type CataractStep, type StepValidation, type Complication } from '../../../packages/curriculum/src';
+import type { StateCreator } from "zustand";
+import type { SimulationState } from "./simulationStore";
+import {
+  cataractCurriculum,
+  type CataractStep,
+  type StepValidation,
+  type Complication,
+} from "../../../packages/curriculum/src";
 
 export interface CurriculumSlice {
   currentCurriculumStep: CataractStep;
@@ -10,13 +15,20 @@ export interface CurriculumSlice {
   procedureStarted: boolean;
 
   advanceCurriculumStep: () => void;
-  validateCurrentCurriculumStep: (instrumentType: string, insertionDepth: number, tiltAlpha: number) => StepValidation;
+  validateCurrentCurriculumStep: (
+    instrumentType: string,
+    insertionDepth: number,
+    tiltAlpha: number,
+  ) => StepValidation;
   resetCurriculum: () => void;
   startProcedure: () => void;
   endProcedure: () => void;
 }
 
-export const createCurriculumSlice: StateCreator<SimulationState, [], [], CurriculumSlice> = (set, get) => ({
+export const createCurriculumSlice: StateCreator<SimulationState, [], [], CurriculumSlice> = (
+  set,
+  get,
+) => ({
   currentCurriculumStep: cataractCurriculum.getCurrentStep(),
   curriculumValidation: null,
   complications: [],
@@ -30,7 +42,11 @@ export const createCurriculumSlice: StateCreator<SimulationState, [], [], Curric
   },
 
   validateCurrentCurriculumStep: (instrumentType, insertionDepth, tiltAlpha) => {
-    const validation = cataractCurriculum.validateCurrentStep(instrumentType, insertionDepth, tiltAlpha);
+    const validation = cataractCurriculum.validateCurrentStep(
+      instrumentType,
+      insertionDepth,
+      tiltAlpha,
+    );
     set({
       curriculumValidation: validation,
       complications: cataractCurriculum.getSession().complications,

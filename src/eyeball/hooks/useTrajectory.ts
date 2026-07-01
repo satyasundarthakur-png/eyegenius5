@@ -1,7 +1,7 @@
-import { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { useSimulationStore } from '../stores/simulationStore';
-import { useNeedlePoseRef } from './useNeedlePose';
+import { useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+import { useSimulationStore } from "../stores/simulationStore";
+import { useNeedlePoseRef } from "./useNeedlePose";
 
 const RECORD_INTERVAL = 0.05;
 
@@ -20,12 +20,12 @@ export function useTrajectoryRecorder() {
   useFrame((_, delta) => {
     if (!poseRef.current) return;
 
-    if (mode === 'REPLAY' && isPlaying) {
+    if (mode === "REPLAY" && isPlaying) {
       advancePlayback();
       return;
     }
 
-    if (mode !== 'EDIT') return;
+    if (mode !== "EDIT") return;
 
     timer.current += delta;
     if (timer.current >= RECORD_INTERVAL) {

@@ -1,9 +1,9 @@
-import type { StateCreator } from 'zustand';
-import type { SimulationState } from './simulationStore';
-import type { InstrumentType } from '../../../packages/instrument-engine/src/types/instrument';
+import type { StateCreator } from "zustand";
+import type { SimulationState } from "./simulationStore";
+import type { InstrumentType } from "../../../packages/instrument-engine/src/types/instrument";
 
-export type SurgicalProcedure = 'cataract' | 'retina' | 'glaucoma' | 'cornea';
-export type EyeSide = 'OD' | 'OS';
+export type SurgicalProcedure = "cataract" | "retina" | "glaucoma" | "cornea";
+export type EyeSide = "OD" | "OS";
 
 /**
  * Standard temporal-approach surgeon positioning, by eye side.
@@ -13,7 +13,7 @@ export type EyeSide = 'OD' | 'OS';
  * the microscope/instrument tray oriented accordingly.
  */
 export function getOperatorPosition(eyeSide: EyeSide): string {
-  return eyeSide === 'OD'
+  return eyeSide === "OD"
     ? "Temporal approach — surgeon seated at the patient's right side (~3 o'clock)"
     : "Temporal approach — surgeon seated at the patient's left side (~9 o'clock)";
 }
@@ -30,39 +30,40 @@ export interface ProcedureInfo {
 
 export const PROCEDURES: ProcedureInfo[] = [
   {
-    id: 'cataract',
-    name: 'Cataract Surgery',
-    description: 'Phacoemulsification with IOL implantation — incision through wound hydration.',
+    id: "cataract",
+    name: "Cataract Surgery",
+    description: "Phacoemulsification with IOL implantation — incision through wound hydration.",
     hasGuidedCurriculum: true,
     instruments: [
-      'keratome',
-      'capsulorhexis_forceps',
-      'hydrodissection_cannula',
-      'phaco_tip',
-      'irrigation_aspiration',
-      'iol_injector',
+      "keratome",
+      "capsulorhexis_forceps",
+      "hydrodissection_cannula",
+      "phaco_tip",
+      "irrigation_aspiration",
+      "iol_injector",
     ],
   },
   {
-    id: 'retina',
-    name: 'Vitreoretinal Surgery',
-    description: 'Pars plana vitrectomy, membrane peeling, and endolaser. Free-practice instruments only.',
+    id: "retina",
+    name: "Vitreoretinal Surgery",
+    description:
+      "Pars plana vitrectomy, membrane peeling, and endolaser. Free-practice instruments only.",
     hasGuidedCurriculum: false,
-    instruments: ['vitrector', 'micro_forceps', 'endolaser'],
+    instruments: ["vitrector", "micro_forceps", "endolaser"],
   },
   {
-    id: 'glaucoma',
-    name: 'Glaucoma Surgery',
-    description: 'Trabeculectomy, tube shunt, and MIGS. Free-practice instruments only.',
+    id: "glaucoma",
+    name: "Glaucoma Surgery",
+    description: "Trabeculectomy, tube shunt, and MIGS. Free-practice instruments only.",
     hasGuidedCurriculum: false,
-    instruments: ['micro_forceps', 'keratome'],
+    instruments: ["micro_forceps", "keratome"],
   },
   {
-    id: 'cornea',
-    name: 'Corneal Surgery',
-    description: 'PK, DALK, DSAEK, DMEK lamellar techniques. Free-practice instruments only.',
+    id: "cornea",
+    name: "Corneal Surgery",
+    description: "PK, DALK, DSAEK, DMEK lamellar techniques. Free-practice instruments only.",
     hasGuidedCurriculum: false,
-    instruments: ['keratome', 'micro_forceps'],
+    instruments: ["keratome", "micro_forceps"],
   },
 ];
 
@@ -73,9 +74,12 @@ export interface ProcedureSlice {
   setEyeSide: (side: EyeSide) => void;
 }
 
-export const createProcedureSlice: StateCreator<SimulationState, [], [], ProcedureSlice> = (set, get) => ({
-  selectedProcedure: 'cataract',
-  eyeSide: 'OD',
+export const createProcedureSlice: StateCreator<SimulationState, [], [], ProcedureSlice> = (
+  set,
+  get,
+) => ({
+  selectedProcedure: "cataract",
+  eyeSide: "OD",
 
   setEyeSide: (side) => {
     set({ eyeSide: side });

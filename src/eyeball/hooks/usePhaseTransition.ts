@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { useSimulationStore } from '../stores/simulationStore';
+import { useEffect, useRef, useState } from "react";
+import { useSimulationStore } from "../stores/simulationStore";
 
 /**
  * Hook that triggers a visual flash animation when the surgical phase changes.
@@ -59,7 +59,9 @@ export function usePhaseTransitionSound() {
       // Lazy load AudioContext on first user interaction
       if (!audioContextRef.current) {
         // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        const AudioContextConstructor = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        const AudioContextConstructor =
+          window.AudioContext ??
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
         audioContextRef.current = new AudioContextConstructor();
       }
 
@@ -73,7 +75,7 @@ export function usePhaseTransitionSound() {
         gainNode.connect(ctx.destination);
 
         oscillator.frequency.value = 800;
-        oscillator.type = 'sine';
+        oscillator.type = "sine";
 
         gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);

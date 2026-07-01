@@ -1,6 +1,6 @@
-import * as THREE from 'three';
-import { useMemo } from 'react';
-import { eyeAnatomy } from '../../../../packages/anatomy-engine/src/EyeAnatomy';
+import * as THREE from "three";
+import { useMemo } from "react";
+import { eyeAnatomy } from "../../../../packages/anatomy-engine/src/EyeAnatomy";
 
 /**
  * Lens assembly — cataractous surgical eye rendering.
@@ -40,24 +40,25 @@ function rng(seed: number) {
 // ---------------------------------------------------------------------------
 function createNucleusTexture(): THREE.CanvasTexture {
   const size = 512;
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = size;
   canvas.height = size;
-  const rawCtx = canvas.getContext('2d');
+  const rawCtx = canvas.getContext("2d");
   if (!rawCtx) return new THREE.CanvasTexture(canvas);
   const ctx: CanvasRenderingContext2D = rawCtx;
   const r = rng(42);
 
   // Radial gradient: dark amber-brown centre → warm amber-yellow → pale straw edge
   // Represents LOCS III NC2-NC3 (nuclear colour grading)
-  const cx = size / 2, cy = size / 2;
+  const cx = size / 2,
+    cy = size / 2;
   const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, size * 0.5);
-  grad.addColorStop(0,    '#7a4a10'); // dense brunescent core
-  grad.addColorStop(0.18, '#9a6018'); // deep amber
-  grad.addColorStop(0.42, '#c88830'); // amber
-  grad.addColorStop(0.68, '#dea848'); // amber-yellow
-  grad.addColorStop(0.85, '#e8c070'); // pale yellow
-  grad.addColorStop(1,    '#f0d898'); // straw at periphery
+  grad.addColorStop(0, "#7a4a10"); // dense brunescent core
+  grad.addColorStop(0.18, "#9a6018"); // deep amber
+  grad.addColorStop(0.42, "#c88830"); // amber
+  grad.addColorStop(0.68, "#dea848"); // amber-yellow
+  grad.addColorStop(0.85, "#e8c070"); // pale yellow
+  grad.addColorStop(1, "#f0d898"); // straw at periphery
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, size, size);
 
@@ -69,9 +70,7 @@ function createNucleusTexture(): THREE.CanvasTexture {
     const angle = r() * Math.PI;
     const alpha = 0.03 + r() * 0.06;
     const dark = r() > 0.5;
-    ctx.strokeStyle = dark
-      ? `rgba(60,30,5,${alpha})`
-      : `rgba(240,200,120,${alpha})`;
+    ctx.strokeStyle = dark ? `rgba(60,30,5,${alpha})` : `rgba(240,200,120,${alpha})`;
     ctx.lineWidth = 0.6 + r() * 1.2;
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -83,12 +82,12 @@ function createNucleusTexture(): THREE.CanvasTexture {
   for (let i = 0; i < 18; i++) {
     const angle = (i / 18) * Math.PI * 2 + (r() - 0.5) * 0.3;
     const startR = size * 0.05 + r() * size * 0.1;
-    const endR   = size * 0.28 + r() * size * 0.15;
+    const endR = size * 0.28 + r() * size * 0.15;
     ctx.strokeStyle = `rgba(255,220,140,${0.12 + r() * 0.12})`;
     ctx.lineWidth = 0.8 + r() * 1.2;
     ctx.beginPath();
     ctx.moveTo(cx + Math.cos(angle) * startR, cy + Math.sin(angle) * startR);
-    ctx.lineTo(cx + Math.cos(angle) * endR,   cy + Math.sin(angle) * endR);
+    ctx.lineTo(cx + Math.cos(angle) * endR, cy + Math.sin(angle) * endR);
     ctx.stroke();
   }
 
@@ -102,19 +101,20 @@ function createNucleusTexture(): THREE.CanvasTexture {
 // ---------------------------------------------------------------------------
 function createCortexTexture(): THREE.CanvasTexture {
   const size = 512;
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = size;
   canvas.height = size;
-  const rawCtx = canvas.getContext('2d');
+  const rawCtx = canvas.getContext("2d");
   if (!rawCtx) return new THREE.CanvasTexture(canvas);
   const ctx: CanvasRenderingContext2D = rawCtx;
   const r = rng(99);
 
   // Base: translucent pale white — normal cortex
-  ctx.fillStyle = 'rgba(245, 240, 232, 0.0)';
+  ctx.fillStyle = "rgba(245, 240, 232, 0.0)";
   ctx.fillRect(0, 0, size, size);
 
-  const cx = size / 2, cy = size / 2;
+  const cx = size / 2,
+    cy = size / 2;
 
   // Cortical spokes — radial wedge-shaped opacities typical of cortical cataract
   const spokeCount = 8 + Math.floor(r() * 6);
@@ -123,15 +123,17 @@ function createCortexTexture(): THREE.CanvasTexture {
     const halfWidth = (0.04 + r() * 0.06) * Math.PI;
     const innerR = size * (0.12 + r() * 0.08);
     const outerR = size * (0.35 + r() * 0.12);
-    const opacity = 0.10 + r() * 0.18;
+    const opacity = 0.1 + r() * 0.18;
 
     const spokeGrad = ctx.createLinearGradient(
-      cx + Math.cos(angle) * innerR, cy + Math.sin(angle) * innerR,
-      cx + Math.cos(angle) * outerR, cy + Math.sin(angle) * outerR
+      cx + Math.cos(angle) * innerR,
+      cy + Math.sin(angle) * innerR,
+      cx + Math.cos(angle) * outerR,
+      cy + Math.sin(angle) * outerR,
     );
-    spokeGrad.addColorStop(0,   `rgba(255,252,245,0)`);
+    spokeGrad.addColorStop(0, `rgba(255,252,245,0)`);
     spokeGrad.addColorStop(0.3, `rgba(255,252,245,${opacity})`);
-    spokeGrad.addColorStop(1,   `rgba(255,252,245,0)`);
+    spokeGrad.addColorStop(1, `rgba(255,252,245,0)`);
 
     ctx.fillStyle = spokeGrad;
     ctx.beginPath();
@@ -143,8 +145,8 @@ function createCortexTexture(): THREE.CanvasTexture {
 
   // Diffuse central cortical haze
   const hazeGrad = ctx.createRadialGradient(cx, cy, size * 0.08, cx, cy, size * 0.42);
-  hazeGrad.addColorStop(0, 'rgba(255,250,240,0.05)');
-  hazeGrad.addColorStop(1, 'rgba(255,250,240,0)');
+  hazeGrad.addColorStop(0, "rgba(255,250,240,0.05)");
+  hazeGrad.addColorStop(1, "rgba(255,250,240,0)");
   ctx.fillStyle = hazeGrad;
   ctx.fillRect(0, 0, size, size);
 
@@ -154,12 +156,12 @@ function createCortexTexture(): THREE.CanvasTexture {
 }
 
 export function Lens() {
-  const capsuleData = eyeAnatomy.getLayerRenderData('lens-capsule');
-  const cortexData  = eyeAnatomy.getLayerRenderData('cortex');
-  const nucleusData = eyeAnatomy.getLayerRenderData('nucleus');
+  const capsuleData = eyeAnatomy.getLayerRenderData("lens-capsule");
+  const cortexData = eyeAnatomy.getLayerRenderData("cortex");
+  const nucleusData = eyeAnatomy.getLayerRenderData("nucleus");
 
   const nucleusTexture = useMemo(() => createNucleusTexture(), []);
-  const cortexTexture  = useMemo(() => createCortexTexture(),  []);
+  const cortexTexture = useMemo(() => createCortexTexture(), []);
 
   const capsuleGeometry = useMemo(() => {
     if (capsuleData) return capsuleData.geometry;
@@ -186,7 +188,6 @@ export function Lens() {
 
   return (
     <group position={[0, 0, 4.5]}>
-
       {/* ── Lens Capsule ─────────────────────────────────────────────────────
           Very thin, clear, highly-reflective outer bag. The capsule is what
           the surgeon scores with the bent-needle/forceps during capsulorhexis.
@@ -257,11 +258,10 @@ export function Lens() {
           metalness={0.03}
           clearcoat={0.35}
           clearcoatRoughness={0.3}
-          emissive={new THREE.Color('#3a1e00')}
+          emissive={new THREE.Color("#3a1e00")}
           emissiveIntensity={0.08}
         />
       </mesh>
-
     </group>
   );
 }

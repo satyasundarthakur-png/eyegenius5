@@ -1,6 +1,6 @@
-import type { StateCreator } from 'zustand';
-import type { SimulationState } from './simulationStore';
-import { replayEngine, type ReplaySession } from '../../../packages/replay-engine/src';
+import type { StateCreator } from "zustand";
+import type { SimulationState } from "./simulationStore";
+import { replayEngine, type ReplaySession } from "../../../packages/replay-engine/src";
 
 export interface ReplayAnalyticsSlice {
   currentReplaySession: ReplaySession | null;
@@ -9,13 +9,22 @@ export interface ReplayAnalyticsSlice {
 
   startReplayRecording: (instrumentType: string) => void;
   logSurgicalEvent: (type: string, data?: Record<string, unknown>) => void;
-  stopReplayRecording: (finalScore: number, complications: number, curriculumStep?: string) => ReplaySession | null;
+  stopReplayRecording: (
+    finalScore: number,
+    complications: number,
+    curriculumStep?: string,
+  ) => ReplaySession | null;
   exportCurrentSession: () => string | null;
   loadReplaySession: (json: string) => boolean;
   clearReplay: () => void;
 }
 
-export const createReplayAnalyticsSlice: StateCreator<SimulationState, [], [], ReplayAnalyticsSlice> = (set, get) => ({
+export const createReplayAnalyticsSlice: StateCreator<
+  SimulationState,
+  [],
+  [],
+  ReplayAnalyticsSlice
+> = (set, get) => ({
   currentReplaySession: null,
   isRecordingReplay: false,
   activeReplaySessionId: null,

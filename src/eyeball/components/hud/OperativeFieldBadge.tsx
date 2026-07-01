@@ -1,5 +1,5 @@
-import { useSimulationStore } from '../../stores/simulationStore';
-import { getOperatorPosition } from '../../stores/procedureSlice';
+import { useSimulationStore } from "../../stores/simulationStore";
+import { getOperatorPosition } from "../../stores/procedureSlice";
 
 export function OperativeFieldBadge() {
   const eyeSide = useSimulationStore((s) => s.eyeSide);
@@ -14,33 +14,31 @@ export function OperativeFieldBadge() {
       <div className="mb-2 grid grid-cols-2 gap-1.5">
         <button
           onClick={() => {
-            setEyeSide('OD');
+            setEyeSide("OD");
           }}
           className={`rounded px-2 py-1.5 text-xs font-semibold transition-colors ${
-            eyeSide === 'OD'
-              ? 'border border-blue-400 bg-blue-600 text-white'
-              : 'border border-transparent text-gray-400 hover:bg-gray-800 hover:text-gray-200'
+            eyeSide === "OD"
+              ? "border border-blue-400 bg-blue-600 text-white"
+              : "border border-transparent text-gray-400 hover:bg-gray-800 hover:text-gray-200"
           }`}
         >
           OD — Right Eye
         </button>
         <button
           onClick={() => {
-            setEyeSide('OS');
+            setEyeSide("OS");
           }}
           className={`rounded px-2 py-1.5 text-xs font-semibold transition-colors ${
-            eyeSide === 'OS'
-              ? 'border border-blue-400 bg-blue-600 text-white'
-              : 'border border-transparent text-gray-400 hover:bg-gray-800 hover:text-gray-200'
+            eyeSide === "OS"
+              ? "border border-blue-400 bg-blue-600 text-white"
+              : "border border-transparent text-gray-400 hover:bg-gray-800 hover:text-gray-200"
           }`}
         >
           OS — Left Eye
         </button>
       </div>
 
-      <p className="text-[10px] leading-snug text-blue-300/60">
-        {getOperatorPosition(eyeSide)}.
-      </p>
+      <p className="text-[10px] leading-snug text-blue-300/60">{getOperatorPosition(eyeSide)}.</p>
     </div>
   );
 }

@@ -1,71 +1,78 @@
-import { useSimulationStore } from '../../stores/simulationStore';
+import { useSimulationStore } from "../../stores/simulationStore";
 
 /** Per-step instructions shown inline on the operative field. */
 const STEP_GUIDE: Record<string, { title: string; action: string; instrument: string }> = {
   incision: {
-    title: '① Incision',
-    action: 'Insert the keratome 2.5–4 mm at a shallow angle into the limbal zone.',
-    instrument: 'Keratome',
+    title: "① Incision",
+    action: "Insert the keratome 2.5–4 mm at a shallow angle into the limbal zone.",
+    instrument: "Keratome",
   },
   capsulorhexis: {
-    title: '② Capsulorhexis',
-    action: 'Advance forceps 1.5–4.5 mm into the anterior chamber. Maintain low elevation angle for a controlled CCC.',
-    instrument: 'Capsulorhexis Forceps',
+    title: "② Capsulorhexis",
+    action:
+      "Advance forceps 1.5–4.5 mm into the anterior chamber. Maintain low elevation angle for a controlled CCC.",
+    instrument: "Capsulorhexis Forceps",
   },
   hydrodissection: {
-    title: '③ Hydrodissection',
-    action: 'Insert cannula 1–3 mm just under the capsule edge. Inject a gentle fluid wave to free the lens.',
-    instrument: 'Hydro Cannula',
+    title: "③ Hydrodissection",
+    action:
+      "Insert cannula 1–3 mm just under the capsule edge. Inject a gentle fluid wave to free the lens.",
+    instrument: "Hydro Cannula",
   },
   phacoemulsification: {
-    title: '④ Phacoemulsification',
-    action: 'Advance phaco tip 5–8 mm into the nucleus. Maintain chamber stability (watch the fluidics panel).',
-    instrument: 'Phaco Tip',
+    title: "④ Phacoemulsification",
+    action:
+      "Advance phaco tip 5–8 mm into the nucleus. Maintain chamber stability (watch the fluidics panel).",
+    instrument: "Phaco Tip",
   },
   cortex_removal: {
-    title: '⑤ Cortex Removal',
-    action: 'Use I/A to aspirate remaining cortex. Maintain vacuum < 280 mmHg and chamber stability > 70%.',
-    instrument: 'I/A Handpiece',
+    title: "⑤ Cortex Removal",
+    action:
+      "Use I/A to aspirate remaining cortex. Maintain vacuum < 280 mmHg and chamber stability > 70%.",
+    instrument: "I/A Handpiece",
   },
   iol_insertion: {
-    title: '⑥ IOL Insertion',
-    action: 'Advance injector 0.5–3.5 mm through the incision. Slow, controlled delivery into the capsular bag.',
-    instrument: 'IOL Injector',
+    title: "⑥ IOL Insertion",
+    action:
+      "Advance injector 0.5–3.5 mm through the incision. Slow, controlled delivery into the capsular bag.",
+    instrument: "IOL Injector",
   },
   wound_hydration: {
-    title: '⑦ Wound Hydration',
-    action: 'Final step: hydrate the incision to seal the wound. Advance gently and confirm watertight closure.',
-    instrument: 'Hydro Cannula',
+    title: "⑦ Wound Hydration",
+    action:
+      "Final step: hydrate the incision to seal the wound. Advance gently and confirm watertight closure.",
+    instrument: "Hydro Cannula",
   },
 };
 
 const PLACE_GUIDE = {
-  title: 'Place Entry Point',
-  action: 'Click anywhere on the white sclera to set the instrument entry point.',
-  instrument: '',
+  title: "Place Entry Point",
+  action: "Click anywhere on the white sclera to set the instrument entry point.",
+  instrument: "",
 };
 
 const VIEW_GUIDE = {
-  title: 'Free Observation',
-  action: 'Press P to enter Place mode and click the eye to begin. Open ☰ Help → Cataract Curriculum → Start Procedure.',
-  instrument: '',
+  title: "Free Observation",
+  action:
+    "Press P to enter Place mode and click the eye to begin. Open ☰ Help → Cataract Curriculum → Start Procedure.",
+  instrument: "",
 };
 
 export function StepGuide() {
-  const currentStep      = useSimulationStore((s) => s.currentCurriculumStep);
+  const currentStep = useSimulationStore((s) => s.currentCurriculumStep);
   const procedureStarted = useSimulationStore((s) => s.procedureStarted);
-  const selectedProc     = useSimulationStore((s) => s.selectedProcedure);
-  const mode             = useSimulationStore((s) => s.mode);
-  const phase            = useSimulationStore((s) => s.phase);
+  const selectedProc = useSimulationStore((s) => s.selectedProcedure);
+  const mode = useSimulationStore((s) => s.mode);
+  const phase = useSimulationStore((s) => s.phase);
 
   // Hide once complete
-  if (phase === 'COMPLETE' || currentStep === 'complete') return null;
+  if (phase === "COMPLETE" || currentStep === "complete") return null;
 
   let guide = VIEW_GUIDE as typeof PLACE_GUIDE;
 
-  if (mode === 'PLACE') {
+  if (mode === "PLACE") {
     guide = PLACE_GUIDE;
-  } else if (selectedProc === 'cataract' && procedureStarted && STEP_GUIDE[currentStep]) {
+  } else if (selectedProc === "cataract" && procedureStarted && STEP_GUIDE[currentStep]) {
     guide = STEP_GUIDE[currentStep];
   }
 

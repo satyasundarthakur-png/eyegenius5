@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
-import { useSimulationStore } from '../stores/simulationStore';
-import { MAX_INSERTION_DEPTH } from '../constants';
+import { useMemo } from "react";
+import { useSimulationStore } from "../stores/simulationStore";
+import { MAX_INSERTION_DEPTH } from "../constants";
 
 /**
  * Computes simulated force feedback based on insertion depth.
@@ -21,7 +21,7 @@ export function useForceFeedback() {
 
   const forceFeedback = useMemo(() => {
     if (!rcmPoint) {
-      return { force: 0, color: '#44ff88', opacity: 0 };
+      return { force: 0, color: "#44ff88", opacity: 0 };
     }
 
     // Normalized force (0 to 1)
