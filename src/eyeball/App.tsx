@@ -15,8 +15,9 @@ import { ScoreCoachPanel } from './components/hud/ScoreCoachPanel';
 import { ProcedureMenu } from './components/hud/ProcedureMenu';
 import { OperativeFieldBadge } from './components/hud/OperativeFieldBadge';
 import { SurgicalStatusBar } from './components/hud/SurgicalStatusBar';
+import { StepGuide } from './components/hud/StepGuide';
 import { OnboardingOverlay, hasSeenOnboarding } from './components/OnboardingOverlay';
-import { HUDSidebar, HUDPanel } from './components/hud/ResponsiveHUD';
+import { LeftSidebar } from './components/hud/LeftSidebar';
 import { useThemeStore } from './stores/themeStore';
 import { useSimulationStore } from './stores/simulationStore';
 import type { SurgicalProcedure } from './stores/procedureSlice';
@@ -24,27 +25,22 @@ import type { SurgicalProcedure } from './stores/procedureSlice';
 /**
  * App — OpenEyeSim root shell
  *
- * HUD layout: two independent single-column sidebars (left / right), each
- * one continuous scrollable flex stack. Panels are ordered by how often a
- * surgeon needs them — most-used at top, rarely-used collapsed by default.
- * This structurally prevents the overlap bug from the old 3-row grid: every
- * panel simply pushes the next one down in normal document flow.
- *
- *   LEFT sidebar  — Mode & Eye, Procedure, Instrument, Microscope, Kinematics
- *   RIGHT sidebar — Curriculum (primary), Depth Chart, Controls, RCM Points,
- *                   Score & AI Coach
- *
- * During surgery the screen is clean (Canvas only). ☰ Help (top-right)
- * toggles all panels. SurgicalStatusBar (bottom-left) always shows
- * phase + mode + a context hint, independent of the HUD.
+ * Layout:
+ *   LEFT  — single unified LeftSidebar (accordion, one section open at a time)
+ *            Contains: Curriculum, Procedure, Instrument, Mode/Controls,
+ *            Microscope, Telemetry, Score, Minimap, User Manual
+ *   RIGHT — slim depth-chart strip (always visible when HUD is open)
+ *   TOP   — StepGuide pill (always visible)
+ *   BOTTOM-LEFT — SurgicalStatusBar (always visible)
+ *   TOP-RIGHT   — ☰ Help toggle
  */
 function App() {
   const theme        = useThemeStore((s) => s.theme);
   const setProcedure = useSimulationStore((s) => s.setProcedure);
 
   const [showIntro, setShowIntro] = useState(() => !hasSeenOnboarding());
-  const showHUD     = useSimulationStore((s) => s.showHUD);
-  const toggleHUD   = useSimulationStore((s) => s.toggleHUD);
+  const showHUD   = useSimulationStore((s) => s.showHUD);
+  const toggleHUD = useSimulationStore((s) => s.toggleHUD);
 
   const bgColor = theme === 'dark' ? '#0a0a1a' : '#f5f5f0';
 
@@ -54,17 +50,12 @@ function App() {
   }
 
   return (
-    <div
-      className={`relative h-screen w-screen overflow-hidden ${
-        theme === 'dark' ? '' : 'bg-gray-100'
-      }`}
-    >
-      {/* ── Intro overlay (shown on first visit) ── */}
-      {showIntro && (
-        <OnboardingOverlay onDismiss={handleIntroDismiss} />
-      )}
+    <div className={`relative h-screen w-screen overflow-hidden ${theme === 'dark' ? '' : 'bg-gray-100'}`}>
 
-      {/* ── 3-D Canvas: always full-screen ── */}
+      {/* Intro overlay */}
+      {showIntro && <OnboardingOverlay onDismiss={handleIntroDismiss} />}
+
+      {/* 3-D Canvas — always full-screen */}
       <div className="absolute inset-0">
         <Canvas
           camera={{ position: [0, 2, 30], fov: 45, near: 1, far: 250 }}
@@ -81,62 +72,13 @@ function App() {
         </Canvas>
       </div>
 
-      {/* ── Always visible: phase / mode / hint ── */}
+      {/* Always-visible overlays */}
+      <StepGuide />
       <SurgicalStatusBar />
 
-      {/* ── HUD sidebars — hidden during surgery, revealed via ☰ Help ── */}
-      {showHUD && (
-        <>
-          {/* LEFT — setup & instrument selection, least-to-most frequently changed */}
-          <HUDSidebar side="left" topOffset="top-4">
-            <HUDPanel title="Mode & Eye" accent="blue">
-              <div className="space-y-2">
-                <ModePanel />
-                <OperativeFieldBadge />
-              </div>
-            </HUDPanel>
-            <HUDPanel title="Procedure" accent="blue">
-              <ProcedureMenu />
-            </HUDPanel>
-            <HUDPanel title="Instrument" accent="green">
-              <InstrumentPanel />
-            </HUDPanel>
-            <HUDPanel title="Microscope" accent="blue" defaultOpen={false}>
-              <MicroscopePanel />
-            </HUDPanel>
-            <HUDPanel title="Instrument Telemetry" accent="amber" defaultOpen={false}>
-              <KinematicsPanel />
-            </HUDPanel>
-            <HUDPanel title="Minimap" accent="blue" defaultOpen={false}>
-              <MiniMap />
-            </HUDPanel>
-          </HUDSidebar>
-
-          {/* RIGHT — curriculum is primary and always open; everything else
-              supports it and stacks below in normal flow (no overlap possible) */}
-          <HUDSidebar side="right" topOffset="top-16">
-            <HUDPanel title="Cataract Curriculum" accent="purple" defaultOpen={true}>
-              <CurriculumPanel />
-            </HUDPanel>
-            <HUDPanel title="Depth Chart" accent="blue" defaultOpen={true}>
-              <RealTimeChart />
-            </HUDPanel>
-            <HUDPanel title="Controls" accent="blue" defaultOpen={false}>
-              <ControlPanel />
-            </HUDPanel>
-            <HUDPanel title="Entry Points" accent="green" defaultOpen={false}>
-              <RCMPointList />
-            </HUDPanel>
-            <HUDPanel title="Score & AI Coach" accent="amber" defaultOpen={false}>
-              <ScoreCoachPanel />
-            </HUDPanel>
-          </HUDSidebar>
-        </>
-      )}
-
-      {/* ── ☰ Help toggle — always visible ── */}
+      {/* ── ☰ Help toggle ── */}
       <button
-        onClick={() => { toggleHUD(); }}
+        onClick={toggleHUD}
         className={`
           pointer-events-auto fixed right-4 top-4 z-50
           flex items-center gap-1.5 rounded-lg border px-3 py-2
@@ -151,7 +93,7 @@ function App() {
         {showHUD ? '✕ Close' : '☰ Help'}
       </button>
 
-      {/* ── Replay intro button (visible when HUD is closed) ── */}
+      {/* Replay intro */}
       {!showHUD && (
         <button
           onClick={() => { setShowIntro(true); }}
@@ -160,6 +102,55 @@ function App() {
         >
           ? Intro
         </button>
+      )}
+
+      {/* ── HUD panels — toggled by ☰ Help ── */}
+      {showHUD && (
+        <>
+          {/* LEFT — unified accordion sidebar */}
+          <LeftSidebar
+            procedurePanel={<ProcedureMenu />}
+            instrumentPanel={<InstrumentPanel />}
+            modePanel={<ModePanel />}
+            microscopePanel={<MicroscopePanel />}
+            kinematicsPanel={<KinematicsPanel />}
+            minimapPanel={<MiniMap />}
+            curriculumPanel={<CurriculumPanel />}
+            scorePanel={<ScoreCoachPanel />}
+            controlPanel={<ControlPanel />}
+            operativeFieldBadge={<OperativeFieldBadge />}
+          />
+
+          {/* RIGHT — slim strip: depth chart + entry points stacked */}
+          <div
+            className="pointer-events-none fixed right-4 top-16 bottom-16 z-30 flex flex-col gap-2"
+            style={{ width: '220px' }}
+          >
+            {/* Depth / real-time chart */}
+            <div className="pointer-events-auto overflow-hidden rounded-xl border border-blue-500/20 bg-gray-950/92 backdrop-blur-md shadow-xl">
+              <div className="border-b border-white/8 px-3 py-2">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-blue-400">
+                  Depth Chart
+                </span>
+              </div>
+              <div className="px-2 py-2">
+                <RealTimeChart />
+              </div>
+            </div>
+
+            {/* Entry points list */}
+            <div className="pointer-events-auto overflow-hidden rounded-xl border border-blue-500/20 bg-gray-950/92 backdrop-blur-md shadow-xl">
+              <div className="border-b border-white/8 px-3 py-2">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-green-400">
+                  Entry Points
+                </span>
+              </div>
+              <div className="px-3 py-2">
+                <RCMPointList />
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
