@@ -13,6 +13,7 @@ import {
   ChevronRight,
   LogOut,
   AlertTriangle,
+  BookOpen,
 } from "lucide-react";
 import { useSimulationStore } from "../../stores/simulationStore";
 
