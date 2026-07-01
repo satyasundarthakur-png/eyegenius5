@@ -15,6 +15,7 @@ import { ScoreCoachPanel } from "./components/hud/ScoreCoachPanel";
 import { ProcedureMenu } from "./components/hud/ProcedureMenu";
 import { OperativeFieldBadge } from "./components/hud/OperativeFieldBadge";
 import { SurgicalStatusBar } from "./components/hud/SurgicalStatusBar";
+import { GlossaryPanel } from "./components/hud/GlossaryPanel";
 import { StepGuide } from "./components/hud/StepGuide";
 import { OnboardingOverlay, hasSeenOnboarding } from "./components/OnboardingOverlay";
 import { LeftSidebar } from "./components/hud/LeftSidebar";
@@ -122,6 +123,7 @@ function App() {
             curriculumPanel={<CurriculumPanel />}
             scorePanel={<ScoreCoachPanel />}
             controlPanel={<ControlPanel />}
+            glossaryPanel={<GlossaryPanel />}
             operativeFieldBadge={<OperativeFieldBadge />}
             onClose={toggleHUD}
           />
