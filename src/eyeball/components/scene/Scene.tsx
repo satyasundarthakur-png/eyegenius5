@@ -6,6 +6,7 @@ import { TrajectoryLines } from "../trajectory/TrajectoryLines";
 import { RCMIndicator } from "../trajectory/RCMIndicator";
 import { RCMConstraintLine } from "../trajectory/RCMConstraintLine";
 import { SafetyCone } from "../trajectory/SafetyCone";
+import { NormalIndicator } from "../trajectory/NormalIndicator";
 import { CollisionIndicator } from "../trajectory/CollisionIndicator";
 import { Lighting } from "./Lighting";
 import { ScleraClickHandler } from "./ScleraClickHandler";
@@ -34,6 +35,8 @@ export function Scene() {
   useReplayAnalytics();
   const mode = useSimulationStore((s) => s.mode);
   const phase = useSimulationStore((s) => s.phase);
+  const showSafetyCone = useSimulationStore((s) => s.showSafetyCone);
+  const showNormalIndicator = useSimulationStore((s) => s.showNormalIndicator);
 
   const orbitEnabled = mode !== "EDIT" && phase === "IDLE";
 
@@ -46,7 +49,8 @@ export function Scene() {
       <TrajectoryLines />
       <RCMConstraintLine />
       <RCMIndicator />
-      <SafetyCone />
+      {showSafetyCone && <SafetyCone />}
+      {showNormalIndicator && <NormalIndicator />}
       <CollisionIndicator />
       <ScleraClickHandler />
       <OrbitControls

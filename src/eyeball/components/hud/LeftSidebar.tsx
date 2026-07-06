@@ -16,6 +16,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { useSimulationStore } from "../../stores/simulationStore";
+import { STORAGE_KEY as ONBOARDING_STORAGE_KEY } from "../OnboardingOverlay";
 
 // ─── Accordion item ────────────────────────────────────────────────────────────
 interface SectionProps {
@@ -298,7 +299,7 @@ function ExitFooter() {
     setConfirming(false);
     // Clear localStorage onboarding flag so the intro overlay shows again
     try {
-      localStorage.removeItem("openeyesim-onboarded-v1");
+      localStorage.removeItem(ONBOARDING_STORAGE_KEY);
     } catch {
       /* */
     }

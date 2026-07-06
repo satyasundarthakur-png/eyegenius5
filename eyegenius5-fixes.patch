@@ -1,0 +1,765 @@
+diff --git a/src/eyeball/App.tsx b/src/eyeball/App.tsx
+index bfa08ff..e0f5843 100644
+--- a/src/eyeball/App.tsx
++++ b/src/eyeball/App.tsx
+@@ -38,6 +38,8 @@ import type { SurgicalProcedure } from "./stores/procedureSlice";
+ function App() {
+   const theme = useThemeStore((s) => s.theme);
+   const setProcedure = useSimulationStore((s) => s.setProcedure);
++  const setMode = useSimulationStore((s) => s.setMode);
++  const startProcedure = useSimulationStore((s) => s.startProcedure);
+ 
+   const [showIntro, setShowIntro] = useState(() => !hasSeenOnboarding());
+   const showHUD = useSimulationStore((s) => s.showHUD);
+@@ -47,6 +49,13 @@ function App() {
+ 
+   function handleIntroDismiss(selectedProcedure: SurgicalProcedure) {
+     setProcedure(selectedProcedure);
++    // Drop the user straight into Mark Entry mode and (for the fully-guided
++    // Cataract procedure) auto-start the curriculum, so finishing onboarding
++    // is enough to begin — no need to hunt for "Start Procedure" in a panel.
++    setMode("PLACE");
++    if (selectedProcedure === "cataract") {
++      startProcedure();
++    }
+     setShowIntro(false);
+   }
+ 
+@@ -96,18 +105,16 @@ function App() {
+         {showHUD ? "✕ Close" : "☰ Help"}
+       </button>
+ 
+-      {/* Replay intro */}
+-      {!showHUD && (
+-        <button
+-          onClick={() => {
+-            setShowIntro(true);
+-          }}
+-          className="pointer-events-auto fixed right-4 top-14 z-50 rounded-lg border border-blue-500/20 bg-gray-950/70 px-3 py-1.5 text-[10px] text-blue-400/60 backdrop-blur hover:text-blue-300/80 transition-colors"
+-          title="Replay intro / change procedure"
+-        >
+-          ? Intro
+-        </button>
+-      )}
++      {/* Replay intro — always reachable, whether or not the HUD panel is open */}
++      <button
++        onClick={() => {
++          setShowIntro(true);
++        }}
++        className="pointer-events-auto fixed right-4 top-14 z-50 rounded-lg border border-blue-500/20 bg-gray-950/70 px-3 py-1.5 text-[10px] text-blue-400/60 backdrop-blur hover:text-blue-300/80 transition-colors"
++        title="Replay intro / change procedure"
++      >
++        ? Intro
++      </button>
+ 
+       {/* ── HUD panels — toggled by ☰ Help ── */}
+       {showHUD && (
+diff --git a/src/eyeball/components/OnboardingOverlay.tsx b/src/eyeball/components/OnboardingOverlay.tsx
+index 752b327..3665ac3 100644
+--- a/src/eyeball/components/OnboardingOverlay.tsx
++++ b/src/eyeball/components/OnboardingOverlay.tsx
+@@ -1,7 +1,7 @@
+ import { useState, type ReactNode } from 'react';
+ import { ChevronRight, ChevronLeft, X } from 'lucide-react';
+ 
+-const STORAGE_KEY = 'openeyesim-onboarded-v3';
++export const STORAGE_KEY = 'openeyesim-onboarded-v3';
+ 
+ // ─── Surgery data ────────────────────────────────────────────────────────────
+ 
+@@ -44,16 +44,16 @@ const SURGERIES: SurgeryInfo[] = [
+     steps: [
+       {
+         num: 'Setup',
+-        title: 'Open the panels',
+-        icon: '☰',
+-        action: 'Press the ☰ Help button (top-right corner). In the Cataract Curriculum panel click "Start Procedure". The eye fixates once you mark an entry point.',
+-        tip: 'All panels are hidden during surgery to keep the operative field clean.',
++        title: "You're ready to go",
++        icon: '📍',
++        action: "When you finish this walkthrough, you'll land in Mark Entry mode with the Cataract Curriculum already started — just click the eye surface near the limbus (3 o'clock position for a right eye) to place your entry point. A green marker locks the keratome entry, and the eye fixates automatically.",
++        tip: 'Open the ☰ Help button any time to see all panels, replay this intro, or switch procedures.',
+       },
+       {
+         num: 'Place',
+         title: 'Mark the entry point',
+         icon: '📍',
+-        action: 'Press P to enter PLACE mode, then click the eye surface near the limbus (3 o\'clock position for a right eye). A green marker locks the keratome entry.',
++        action: 'Click the eye surface near the limbus (3 o\'clock position for a right eye). A green marker locks the keratome entry. (If you ever need to re-enter Mark Entry mode later, press P.)',
+         tip: 'The camera locks once the entry point is marked — you can no longer orbit the eye.',
+       },
+       {
+diff --git a/src/eyeball/components/hud/LeftSidebar.tsx b/src/eyeball/components/hud/LeftSidebar.tsx
+index b57162b..c6ae9d9 100644
+--- a/src/eyeball/components/hud/LeftSidebar.tsx
++++ b/src/eyeball/components/hud/LeftSidebar.tsx
+@@ -16,6 +16,7 @@ import {
+   BookOpen,
+ } from "lucide-react";
+ import { useSimulationStore } from "../../stores/simulationStore";
++import { STORAGE_KEY as ONBOARDING_STORAGE_KEY } from "../OnboardingOverlay";
+ 
+ // ─── Accordion item ────────────────────────────────────────────────────────────
+ interface SectionProps {
+@@ -298,7 +299,7 @@ function ExitFooter() {
+     setConfirming(false);
+     // Clear localStorage onboarding flag so the intro overlay shows again
+     try {
+-      localStorage.removeItem("openeyesim-onboarded-v1");
++      localStorage.removeItem(ONBOARDING_STORAGE_KEY);
+     } catch {
+       /* */
+     }
+diff --git a/src/eyeball/components/hud/ResponsiveHUD.tsx b/src/eyeball/components/hud/ResponsiveHUD.tsx
+deleted file mode 100644
+index 334ab80..0000000
+--- a/src/eyeball/components/hud/ResponsiveHUD.tsx
++++ /dev/null
+@@ -1,137 +0,0 @@
+-import { useState, type ReactNode } from "react";
+-import { useBreakpoint } from "../../hooks/useBreakpoint";
+-
+-/**
+- * HUDPanel — collapsible section card.
+- * Desktop/tablet: always a collapsible accordion (consistent everywhere,
+- * not just mobile) so a long sidebar stays manageable — low-priority
+- * panels (Microscope, Score & Coach) default closed.
+- */
+-export function HUDPanel({
+-  children,
+-  title,
+-  defaultOpen = true,
+-  accent = "blue",
+-}: {
+-  children: ReactNode;
+-  title: string;
+-  defaultOpen?: boolean;
+-  accent?: "blue" | "green" | "amber" | "purple";
+-}) {
+-  const [isOpen, setIsOpen] = useState(defaultOpen);
+-
+-  const accentText = {
+-    blue: "text-blue-400",
+-    green: "text-green-400",
+-    amber: "text-amber-400",
+-    purple: "text-purple-400",
+-  }[accent];
+-
+-  return (
+-    <div className="pointer-events-auto overflow-hidden rounded-lg border border-blue-500/25 bg-gray-950/90 backdrop-blur">
+-      <button
+-        onClick={() => {
+-          setIsOpen((v) => !v);
+-        }}
+-        className="flex w-full items-center justify-between px-3 py-2 text-left transition-colors hover:bg-blue-500/5"
+-      >
+-        <span className={`text-xs font-semibold tracking-wider uppercase ${accentText}`}>
+-          {title}
+-        </span>
+-        <span
+-          className="text-blue-300/40 transition-transform"
+-          style={{ transform: isOpen ? "rotate(0deg)" : "rotate(-90deg)" }}
+-        >
+-          ▾
+-        </span>
+-      </button>
+-      {isOpen && <div className="border-t border-blue-500/15 px-3 py-3">{children}</div>}
+-    </div>
+-  );
+-}
+-
+-/**
+- * HUDSidebar — single continuous scrollable column, fixed to one screen edge.
+- *
+- * Replaces the old 3-row grid. Panels stack in normal document flow —
+- * structurally impossible for two panels to overlap, since each one
+- * simply pushes the next one down. The whole column scrolls as one unit
+- * once content exceeds the viewport.
+- *
+- * `topOffset` reserves space below the floating ☰ Help button (right side)
+- * or the top edge (left side) so the sidebar never starts under it.
+- */
+-export function HUDSidebar({
+-  side,
+-  children,
+-  topOffset = "top-16",
+-}: {
+-  side: "left" | "right";
+-  children: ReactNode;
+-  topOffset?: string;
+-}) {
+-  const bp = useBreakpoint();
+-  const isMobile = bp === "sm";
+-
+-  if (isMobile) {
+-    // Mobile: single bottom drawer, both sides merge into one stack.
+-    // (Two separate <HUDSidebar> calls each render their own drawer
+-    // section; App.tsx stacks left then right for a natural reading order.)
+-    return (
+-      <div className="pointer-events-none w-full px-2 pb-2">
+-        <div className="pointer-events-auto flex flex-col gap-2">{children}</div>
+-      </div>
+-    );
+-  }
+-
+-  const widthClass = bp === "md" ? "w-60" : "w-72";
+-  const sideClass = side === "left" ? "left-4" : "right-4";
+-
+-  return (
+-    <div
+-      className={`pointer-events-none fixed ${topOffset} bottom-4 ${sideClass} z-30 ${widthClass}`}
+-    >
+-      <div
+-        className="pointer-events-auto flex h-full flex-col gap-2.5 overflow-y-auto pr-1"
+-        style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(59,130,246,0.3) transparent" }}
+-      >
+-        {children}
+-      </div>
+-    </div>
+-  );
+-}
+-
+-/**
+- * HUDLayout — thin compatibility wrapper kept for any remaining callers.
+- * New code should use <HUDSidebar side="left|right"> directly (see App.tsx).
+- */
+-export function HUDLayout({
+-  topLeft,
+-  topRight,
+-  midLeft,
+-  midRight,
+-  bottomRight,
+-  bottomLeft,
+-}: {
+-  topLeft?: ReactNode;
+-  topRight?: ReactNode;
+-  midLeft?: ReactNode;
+-  midRight?: ReactNode;
+-  bottomRight?: ReactNode;
+-  bottomLeft?: ReactNode;
+-}) {
+-  return (
+-    <>
+-      <HUDSidebar side="left">
+-        {topLeft}
+-        {midLeft}
+-        {bottomLeft}
+-      </HUDSidebar>
+-      <HUDSidebar side="right">
+-        {topRight}
+-        {midRight}
+-        {bottomRight}
+-      </HUDSidebar>
+-    </>
+-  );
+-}
+diff --git a/src/eyeball/components/hud/SettingsPanel.tsx b/src/eyeball/components/hud/SettingsPanel.tsx
+index 611a8a5..0a6dbaf 100644
+--- a/src/eyeball/components/hud/SettingsPanel.tsx
++++ b/src/eyeball/components/hud/SettingsPanel.tsx
+@@ -82,16 +82,15 @@ function KeyBindingRow({ bindingKey }: { bindingKey: keyof KeyBindings }) {
+ }
+ 
+ export function SettingsPanel({ onClose }: SettingsPanelProps) {
+-  const [corneaOpacity, setCorneaOpacity] = useState(0.35);
+-  const [lightIntensity, setLightIntensity] = useState(1.0);
+-  const [showSafetyCone, setShowSafetyCone] = useState(true);
+-  const [showNormalIndicator, setShowNormalIndicator] = useState(true);
+   const [showKeybindings, setShowKeybindings] = useState(false);
+ 
+-  const mode = useSimulationStore((s) => s.mode);
+   const theme = useThemeStore((s) => s.theme);
+   const setTheme = useThemeStore((s) => s.setTheme);
+   const resetKeyBindings = useKeyBindingsStore((s) => s.resetKeyBindings);
++  const showSafetyCone = useSimulationStore((s) => s.showSafetyCone);
++  const setShowSafetyCone = useSimulationStore((s) => s.setShowSafetyCone);
++  const showNormalIndicator = useSimulationStore((s) => s.showNormalIndicator);
++  const setShowNormalIndicator = useSimulationStore((s) => s.setShowNormalIndicator);
+ 
+   return (
+     <div className="pointer-events-auto fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+@@ -141,46 +140,9 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
+             </div>
+           </div>
+ 
+-          {/* Cornea Opacity */}
+-          <div>
+-            <label className="mb-1.5 block text-sm text-blue-100">
+-              Cornea Opacity: {corneaOpacity.toFixed(2)}
+-            </label>
+-            <input
+-              type="range"
+-              min={0.1}
+-              max={0.8}
+-              step={0.05}
+-              value={corneaOpacity}
+-              onChange={(e) => {
+-                setCorneaOpacity(parseFloat(e.target.value));
+-              }}
+-              className="w-full accent-blue-500 [&::-webkit-slider-thumb]:cursor-pointer"
+-              disabled={mode !== "VIEW"}
+-            />
+-            <p className="mt-1 text-xs text-blue-300/60">
+-              Adjust transparency of the cornea. Changes apply in VIEW mode.
+-            </p>
+-          </div>
+-
+-          {/* Light Intensity */}
+-          <div>
+-            <label className="mb-1.5 block text-sm text-blue-100">
+-              Light Intensity: {lightIntensity.toFixed(1)}
+-            </label>
+-            <input
+-              type="range"
+-              min={0.5}
+-              max={2.0}
+-              step={0.1}
+-              value={lightIntensity}
+-              onChange={(e) => {
+-                setLightIntensity(parseFloat(e.target.value));
+-              }}
+-              className="w-full accent-blue-500 [&::-webkit-slider-thumb]:cursor-pointer"
+-            />
+-            <p className="mt-1 text-xs text-blue-300/60">Adjust scene lighting intensity.</p>
+-          </div>
++          {/* Note: coaxial light intensity is a real, functional control — it lives in
++              the Microscope panel (not here) since it's tied to the simulated
++              operating-microscope model rather than being a generic scene light. */}
+ 
+           {/* Visibility Toggles */}
+           <div className="space-y-2">
+@@ -245,7 +207,8 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
+           {/* Info */}
+           <div className="rounded border border-blue-500/15 bg-blue-500/5 px-3 py-2">
+             <p className="text-xs text-blue-300/70">
+-              💡 Tip: Settings are saved to localStorage and persist across sessions.
++              💡 Tip: Theme and keyboard shortcuts are saved to your browser and persist across
++              sessions. Visualization toggles reset when you reload.
+             </p>
+           </div>
+         </div>
+diff --git a/src/eyeball/components/needle/NeedleTip.tsx b/src/eyeball/components/needle/NeedleTip.tsx
+deleted file mode 100644
+index 1861ff8..0000000
+--- a/src/eyeball/components/needle/NeedleTip.tsx
++++ /dev/null
+@@ -1,32 +0,0 @@
+-import { useMemo } from 'react';
+-import * as THREE from 'three';
+-import { COLORS } from '../../constants';
+-import { useForceFeedback } from '../../hooks/useForceFeedback';
+-
+-interface NeedleTipProps {
+-  position: [number, number, number];
+-}
+-
+-export function NeedleTip({ position }: NeedleTipProps) {
+-  const geometry = useMemo(() => {
+-    // Tapered cone/bevel tip
+-    const geo = new THREE.ConeGeometry(0.15, 1.5, 12);
+-    geo.rotateX(Math.PI / 2);
+-    geo.translate(0, 0, 0.75);
+-    return geo;
+-  }, []);
+-
+-  const { force, color } = useForceFeedback();
+-
+-  return (
+-    <mesh geometry={geometry} position={position}>
+-      <meshStandardMaterial
+-        color={force > 0.01 ? color : COLORS.needleTip}
+-        metalness={0.9}
+-        roughness={0.1}
+-        emissive={force > 0.01 ? color : COLORS.needleTip}
+-        emissiveIntensity={0.1 + force * 0.5}
+-      />
+-    </mesh>
+-  );
+-}
+diff --git a/src/eyeball/components/scene/Scene.tsx b/src/eyeball/components/scene/Scene.tsx
+index bff28c1..6142064 100644
+--- a/src/eyeball/components/scene/Scene.tsx
++++ b/src/eyeball/components/scene/Scene.tsx
+@@ -6,6 +6,7 @@ import { TrajectoryLines } from "../trajectory/TrajectoryLines";
+ import { RCMIndicator } from "../trajectory/RCMIndicator";
+ import { RCMConstraintLine } from "../trajectory/RCMConstraintLine";
+ import { SafetyCone } from "../trajectory/SafetyCone";
++import { NormalIndicator } from "../trajectory/NormalIndicator";
+ import { CollisionIndicator } from "../trajectory/CollisionIndicator";
+ import { Lighting } from "./Lighting";
+ import { ScleraClickHandler } from "./ScleraClickHandler";
+@@ -34,6 +35,8 @@ export function Scene() {
+   useReplayAnalytics();
+   const mode = useSimulationStore((s) => s.mode);
+   const phase = useSimulationStore((s) => s.phase);
++  const showSafetyCone = useSimulationStore((s) => s.showSafetyCone);
++  const showNormalIndicator = useSimulationStore((s) => s.showNormalIndicator);
+ 
+   const orbitEnabled = mode !== "EDIT" && phase === "IDLE";
+ 
+@@ -46,7 +49,8 @@ export function Scene() {
+       <TrajectoryLines />
+       <RCMConstraintLine />
+       <RCMIndicator />
+-      <SafetyCone />
++      {showSafetyCone && <SafetyCone />}
++      {showNormalIndicator && <NormalIndicator />}
+       <CollisionIndicator />
+       <ScleraClickHandler />
+       <OrbitControls
+diff --git a/src/eyeball/components/trajectory/Annotations3D.tsx b/src/eyeball/components/trajectory/Annotations3D.tsx
+deleted file mode 100644
+index 1e5ce04..0000000
+--- a/src/eyeball/components/trajectory/Annotations3D.tsx
++++ /dev/null
+@@ -1,57 +0,0 @@
+-import { Html } from '@react-three/drei';
+-import { useSimulationStore } from '../../stores/simulationStore';
+-
+-export function Annotations3D() {
+-  const rcmPoint = useSimulationStore((s) => s.rcmPoint);
+-  const surfaceNormal = useSimulationStore((s) => s.surfaceNormal);
+-  const insertionDepth = useSimulationStore((s) => s.insertionDepth);
+-  const mode = useSimulationStore((s) => s.mode);
+-
+-  if (mode !== 'EDIT' || !rcmPoint) return null;
+-
+-  return (
+-    <>
+-      {/* RCM Point label */}
+-      <Html
+-        position={rcmPoint}
+-        center
+-        distanceFactor={40}
+-        className="pointer-events-none select-none"
+-      >
+-        <div className="rounded bg-black/80 px-2 py-1 text-xs font-mono text-green-400 whitespace-nowrap backdrop-blur-sm">
+-          RCM ({rcmPoint.map((v) => v.toFixed(1)).join(', ')})
+-        </div>
+-      </Html>
+-
+-      {/* Surface normal arrow label */}
+-      {surfaceNormal && (
+-        <Html
+-          position={[
+-            rcmPoint[0] + surfaceNormal[0] * 2,
+-            rcmPoint[1] + surfaceNormal[1] * 2,
+-            rcmPoint[2] + surfaceNormal[2] * 2,
+-          ]}
+-          center
+-          distanceFactor={40}
+-          className="pointer-events-none select-none"
+-        >
+-          <div className="rounded bg-black/80 px-2 py-1 text-[10px] font-mono text-blue-300 whitespace-nowrap backdrop-blur-sm">
+-            N ({surfaceNormal.map((v) => v.toFixed(2)).join(', ')})
+-          </div>
+-        </Html>
+-      )}
+-
+-      {/* Insertion depth label near needle tip */}
+-      <Html
+-        position={[rcmPoint[0], rcmPoint[1], rcmPoint[2] - 3]}
+-        center
+-        distanceFactor={40}
+-        className="pointer-events-none select-none"
+-      >
+-        <div className="rounded bg-black/80 px-2 py-1 text-xs font-mono text-amber-400 whitespace-nowrap backdrop-blur-sm">
+-          Depth: {insertionDepth.toFixed(1)} mm
+-        </div>
+-      </Html>
+-    </>
+-  );
+-}
+diff --git a/src/eyeball/components/trajectory/ObjectLabels.tsx b/src/eyeball/components/trajectory/ObjectLabels.tsx
+deleted file mode 100644
+index 9dfa2e2..0000000
+--- a/src/eyeball/components/trajectory/ObjectLabels.tsx
++++ /dev/null
+@@ -1,93 +0,0 @@
+-import { Html } from '@react-three/drei';
+-import { useSimulationStore } from '../../stores/simulationStore';
+-import { useMemo } from 'react';
+-import { ENTRY_POINT_LABEL } from '../../constants/terminology';
+-import * as THREE from 'three';
+-
+-/**
+- * 3D annotations showing real-time spatial information (RCM point,
+- * needle tip coordinates, tilt angles).
+- *
+- * Gated on `showHUD` — these are coordinate/debug overlays, not part of
+- * the clean surgical field. They were previously always rendered, which
+- * meant the "Tip" label sat centered directly on top of the needle tip
+- * during active surgery, covering the exact point the surgeon needs to
+- * see clearly. They now only appear when the ☰ Help panel is open, and
+- * even then are offset away from the tip rather than centered on it.
+- */
+-export function ObjectLabels() {
+-  const showHUD = useSimulationStore((s) => s.showHUD);
+-  const rcmPoint = useSimulationStore((s) => s.rcmPoint);
+-  const surfaceNormal = useSimulationStore((s) => s.surfaceNormal);
+-  const tiltAlpha = useSimulationStore((s) => s.tiltAlpha);
+-  const tiltBeta = useSimulationStore((s) => s.tiltBeta);
+-  const insertionDepth = useSimulationStore((s) => s.insertionDepth);
+-
+-  const tipPosition = useMemo(() => {
+-    if (!rcmPoint || !surfaceNormal) return null;
+-
+-    const normal = new THREE.Vector3(...surfaceNormal);
+-    const up = new THREE.Vector3(0, 0, 1);
+-    const right = new THREE.Vector3().crossVectors(normal, up).normalize();
+-
+-    const direction = normal.clone();
+-    direction.applyAxisAngle(right, tiltAlpha);
+-    direction.applyAxisAngle(normal, tiltBeta);
+-
+-    const tip = new THREE.Vector3(...rcmPoint).add(direction.clone().multiplyScalar(insertionDepth));
+-    return [tip.x, tip.y, tip.z] as [number, number, number];
+-  }, [rcmPoint, surfaceNormal, tiltAlpha, tiltBeta, insertionDepth]);
+-
+-  // Hidden entirely outside the HUD-open state — never covers the tip
+-  // during the clean surgical view.
+-  if (!showHUD || !rcmPoint || !tipPosition) return null;
+-
+-  // Offset vector — pushes each label up and to the right of its anchor
+-  // point so the label box never sits directly on top of the geometry
+-  // it describes; it points at it instead, like a leader line.
+-  const LABEL_OFFSET = new THREE.Vector3(1.2, 1.8, 0);
+-
+-  const rcmLabelPos = new THREE.Vector3(...rcmPoint).add(LABEL_OFFSET);
+-  const tipLabelPos = new THREE.Vector3(...tipPosition).add(LABEL_OFFSET);
+-  const tiltLabelPos = new THREE.Vector3(...tipPosition).add(new THREE.Vector3(1.2, 3.6, 0));
+-
+-  return (
+-    <>
+-      {/* RCM Point Label — offset, not centered on the marker */}
+-      <Html position={rcmLabelPos} center={false} distanceFactor={8} zIndexRange={[0, 0]}>
+-        <div className="pointer-events-none -translate-y-1/2 rounded bg-blue-950/90 px-2 py-1 text-[10px] text-blue-100 shadow-lg backdrop-blur-sm border border-blue-500/30">
+-          <div className="font-semibold text-blue-400">{ENTRY_POINT_LABEL}</div>
+-          <div className="font-mono">
+-            [{rcmPoint[0].toFixed(1)}, {rcmPoint[1].toFixed(1)}, {rcmPoint[2].toFixed(1)}]
+-          </div>
+-        </div>
+-      </Html>
+-
+-      {/* Needle Tip Label — offset up-right of the actual tip, never covering it */}
+-      <Html position={tipLabelPos} center={false} distanceFactor={8} zIndexRange={[0, 0]}>
+-        <div className="pointer-events-none -translate-y-1/2 rounded bg-red-950/90 px-2 py-1 text-[10px] text-red-100 shadow-lg backdrop-blur-sm border border-red-500/30">
+-          <div className="font-semibold text-red-400">Tip</div>
+-          <div className="font-mono">
+-            [{tipPosition[0].toFixed(1)}, {tipPosition[1].toFixed(1)}, {tipPosition[2].toFixed(1)}]
+-          </div>
+-          <div className="mt-1 text-red-300">Depth: {insertionDepth.toFixed(1)}mm</div>
+-        </div>
+-      </Html>
+-
+-      {/* Tilt Angles Label — stacked further above so it doesn't collide with Tip label */}
+-      {insertionDepth > 0 && (
+-        <Html position={tiltLabelPos} center={false} distanceFactor={10} zIndexRange={[0, 0]}>
+-          <div className="pointer-events-none -translate-y-1/2 rounded bg-amber-950/90 px-2 py-1 text-[10px] text-amber-100 shadow-lg backdrop-blur-sm border border-amber-500/30">
+-            <div className="font-semibold text-amber-400">Tilt</div>
+-            <div className="font-mono">
+-              α: {(tiltAlpha * (180 / Math.PI)).toFixed(1)}°
+-            </div>
+-            <div className="font-mono">
+-              β: {(tiltBeta * (180 / Math.PI)).toFixed(1)}°
+-            </div>
+-          </div>
+-        </Html>
+-      )}
+-    </>
+-  );
+-}
+diff --git a/src/eyeball/hooks/useAutoPhaseTransition.ts b/src/eyeball/hooks/useAutoPhaseTransition.ts
+index 49e3751..2f79388 100644
+--- a/src/eyeball/hooks/useAutoPhaseTransition.ts
++++ b/src/eyeball/hooks/useAutoPhaseTransition.ts
+@@ -1,6 +1,7 @@
+ import { useEffect, useRef } from "react";
+ import { useSimulationStore } from "../stores/simulationStore";
+ import { SurgicalPhase } from "../types";
++import { MAX_INSERTION_DEPTH } from "../constants";
+ 
+ /**
+  * Hook that automatically transitions surgical phases based on:
+@@ -22,7 +23,7 @@ export function useAutoPhaseTransition() {
+     }
+ 
+     // Auto-transition: INSERTING → WITHDRAWING when depth stays at max for 1s
+-    if (phase === SurgicalPhase.INSERTING && insertionDepth >= 17) {
++    if (phase === SurgicalPhase.INSERTING && insertionDepth >= MAX_INSERTION_DEPTH) {
+       maxDepthTimerRef.current = setTimeout(() => {
+         useSimulationStore.getState().setPhase(SurgicalPhase.WITHDRAWING);
+       }, 1000);
+diff --git a/src/eyeball/hooks/useTouchPinch.ts b/src/eyeball/hooks/useTouchPinch.ts
+index 1c4216b..398da43 100644
+--- a/src/eyeball/hooks/useTouchPinch.ts
++++ b/src/eyeball/hooks/useTouchPinch.ts
+@@ -1,52 +1,56 @@
+-import { useRef, useEffect } from "react";
++import { useEffect, useRef } from "react";
+ import { useSimulationStore } from "../stores/simulationStore";
+ import { MAX_INSERTION_DEPTH } from "../constants";
+ 
+ /**
+  * Handles touch pinch-to-zoom gestures for adjusting insertion depth on mobile devices.
+  * Two-finger pinch gesture adjusts the needle insertion depth.
++ *
++ * Listeners are attached once (empty dependency array) and always read the
++ * live store state via getState() inside the handlers, rather than re-adding
++ * the listeners on every render — re-adding on every render (as before) could
++ * drop touch events mid-gesture if a re-render happened between touchstart
++ * and touchend.
+  */
+ export function useTouchPinch() {
+-  const mode = useSimulationStore((s) => s.mode);
+-  const rcmPoint = useSimulationStore((s) => s.rcmPoint);
+-  const setInsertionDepth = useSimulationStore((s) => s.setInsertionDepth);
+-
+   const initialPinchDistance = useRef<number | null>(null);
+   const initialDepth = useRef<number>(0);
+ 
+-  function getPinchDistance(touches: TouchList): number {
+-    if (touches.length < 2) return 0;
+-    const dx = touches[0].clientX - touches[1].clientX;
+-    const dy = touches[0].clientY - touches[1].clientY;
+-    return Math.sqrt(dx * dx + dy * dy);
+-  }
+-
+-  function handleTouchStart(e: TouchEvent) {
+-    if (mode !== "EDIT" || !rcmPoint) return;
+-    if (e.touches.length === 2) {
+-      initialPinchDistance.current = getPinchDistance(e.touches);
+-      initialDepth.current = useSimulationStore.getState().insertionDepth;
++  useEffect(() => {
++    const canvas = document.querySelector("canvas");
++    if (!canvas) return;
++
++    function getPinchDistance(touches: TouchList): number {
++      if (touches.length < 2) return 0;
++      const dx = touches[0].clientX - touches[1].clientX;
++      const dy = touches[0].clientY - touches[1].clientY;
++      return Math.sqrt(dx * dx + dy * dy);
+     }
+-  }
+-
+-  function handleTouchMove(e: TouchEvent) {
+-    if (mode !== "EDIT" || !rcmPoint) return;
+-    if (e.touches.length === 2 && initialPinchDistance.current !== null) {
+-      e.preventDefault();
+-      const currentDistance = getPinchDistance(e.touches);
+-      const delta = (currentDistance - initialPinchDistance.current) / 50;
+-      const newDepth = Math.max(0, Math.min(initialDepth.current + delta, MAX_INSERTION_DEPTH));
+-      setInsertionDepth(newDepth);
++
++    function handleTouchStart(e: TouchEvent) {
++      const { mode, rcmPoint, insertionDepth } = useSimulationStore.getState();
++      if (mode !== "EDIT" || !rcmPoint) return;
++      if (e.touches.length === 2) {
++        initialPinchDistance.current = getPinchDistance(e.touches);
++        initialDepth.current = insertionDepth;
++      }
+     }
+-  }
+ 
+-  function handleTouchEnd() {
+-    initialPinchDistance.current = null;
+-  }
++    function handleTouchMove(e: TouchEvent) {
++      const { mode, rcmPoint, setInsertionDepth } = useSimulationStore.getState();
++      if (mode !== "EDIT" || !rcmPoint) return;
++      if (e.touches.length === 2 && initialPinchDistance.current !== null) {
++        e.preventDefault();
++        const currentDistance = getPinchDistance(e.touches);
++        const delta = (currentDistance - initialPinchDistance.current) / 50;
++        const newDepth = Math.max(0, Math.min(initialDepth.current + delta, MAX_INSERTION_DEPTH));
++        setInsertionDepth(newDepth);
++      }
++    }
+ 
+-  useEffect(() => {
+-    const canvas = document.querySelector("canvas");
+-    if (!canvas) return;
++    function handleTouchEnd() {
++      initialPinchDistance.current = null;
++    }
+ 
+     canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
+     canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
+@@ -57,5 +61,5 @@ export function useTouchPinch() {
+       canvas.removeEventListener("touchmove", handleTouchMove);
+       canvas.removeEventListener("touchend", handleTouchEnd);
+     };
+-  });
++  }, []);
+ }
+diff --git a/src/eyeball/stores/needleSlice.ts b/src/eyeball/stores/needleSlice.ts
+index aeba107..604c971 100644
+--- a/src/eyeball/stores/needleSlice.ts
++++ b/src/eyeball/stores/needleSlice.ts
+@@ -44,7 +44,10 @@ export const createNeedleSlice: StateCreator<SimulationState, [], [], NeedleSlic
+     const clamped = Math.max(0, Math.min(insertionDepth, MAX_INSERTION_DEPTH));
+     const { phase } = get();
+     let newPhase = phase;
+-    if (phase === "CONTACT") {
++    // Matches phaseMachine.ts's documented contract: CONTACT -> INSERTING only
++    // once the instrument actually has some depth (or tilt, handled in
++    // setTiltAngles) — depth 0 alone should not count as "moved".
++    if (phase === "CONTACT" && clamped > 0) {
+       newPhase = transitionPhase(phase, "needleMoved");
+     } else if (clamped <= 0 && phase === "INSERTING") {
+       newPhase = transitionPhase(phase, "depthReturned");
+@@ -65,7 +68,7 @@ export const createNeedleSlice: StateCreator<SimulationState, [], [], NeedleSlic
+   },
+ 
+   reset: () => {
+-    const { resetMicroscope, clearReplay, setProcedure } = get();
++    const { resetMicroscope, clearReplay, setProcedure, resetPhysics } = get();
+     set({
+       mode: "VIEW",
+       tiltAlpha: 0,
+@@ -89,10 +92,12 @@ export const createNeedleSlice: StateCreator<SimulationState, [], [], NeedleSlic
+       playbackSpeed: 1,
+       playbackIndex: 0,
+     });
+-    // Reset the surgical-workflow engines (microscope, curriculum, scoring/coach, replay)
+-    // so a fresh attempt doesn't inherit progress/score from the previous one.
++    // Reset the surgical-workflow engines (microscope, curriculum, scoring/coach, replay,
++    // physics/tissue-deformation) so a fresh attempt doesn't inherit progress, score, or
++    // capsule-tear state from the previous one.
+     resetMicroscope();
+     clearReplay();
++    resetPhysics();
+     setProcedure("cataract");
+   },
+ });
+diff --git a/src/eyeball/stores/uiSlice.ts b/src/eyeball/stores/uiSlice.ts
+index 3aa93cd..a8ce887 100644
+--- a/src/eyeball/stores/uiSlice.ts
++++ b/src/eyeball/stores/uiSlice.ts
+@@ -7,6 +7,12 @@ export interface UISlice {
+   showHUD: boolean;
+   setShowHUD: (v: boolean) => void;
+   toggleHUD: () => void;
++
++  /** Visualization toggles — controlled from the Settings panel and read by Scene.tsx. */
++  showSafetyCone: boolean;
++  setShowSafetyCone: (v: boolean) => void;
++  showNormalIndicator: boolean;
++  setShowNormalIndicator: (v: boolean) => void;
+ }
+ 
+ export const createUISlice: StateCreator<SimulationState, [], [], UISlice> = (set, get) => ({
+@@ -17,4 +23,13 @@ export const createUISlice: StateCreator<SimulationState, [], [], UISlice> = (se
+   toggleHUD: () => {
+     set({ showHUD: !get().showHUD });
+   },
++
++  showSafetyCone: true,
++  setShowSafetyCone: (v) => {
++    set({ showSafetyCone: v });
++  },
++  showNormalIndicator: true,
++  setShowNormalIndicator: (v) => {
++    set({ showNormalIndicator: v });
++  },
+ });

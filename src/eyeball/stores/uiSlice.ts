@@ -7,6 +7,12 @@ export interface UISlice {
   showHUD: boolean;
   setShowHUD: (v: boolean) => void;
   toggleHUD: () => void;
+
+  /** Visualization toggles — controlled from the Settings panel and read by Scene.tsx. */
+  showSafetyCone: boolean;
+  setShowSafetyCone: (v: boolean) => void;
+  showNormalIndicator: boolean;
+  setShowNormalIndicator: (v: boolean) => void;
 }
 
 export const createUISlice: StateCreator<SimulationState, [], [], UISlice> = (set, get) => ({
@@ -16,5 +22,14 @@ export const createUISlice: StateCreator<SimulationState, [], [], UISlice> = (se
   },
   toggleHUD: () => {
     set({ showHUD: !get().showHUD });
+  },
+
+  showSafetyCone: true,
+  setShowSafetyCone: (v) => {
+    set({ showSafetyCone: v });
+  },
+  showNormalIndicator: true,
+  setShowNormalIndicator: (v) => {
+    set({ showNormalIndicator: v });
   },
 });

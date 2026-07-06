@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useSimulationStore } from "../stores/simulationStore";
 import { SurgicalPhase } from "../types";
+import { MAX_INSERTION_DEPTH } from "../constants";
 
 /**
  * Hook that automatically transitions surgical phases based on:
@@ -22,7 +23,7 @@ export function useAutoPhaseTransition() {
     }
 
     // Auto-transition: INSERTING → WITHDRAWING when depth stays at max for 1s
-    if (phase === SurgicalPhase.INSERTING && insertionDepth >= 17) {
+    if (phase === SurgicalPhase.INSERTING && insertionDepth >= MAX_INSERTION_DEPTH) {
       maxDepthTimerRef.current = setTimeout(() => {
         useSimulationStore.getState().setPhase(SurgicalPhase.WITHDRAWING);
       }, 1000);

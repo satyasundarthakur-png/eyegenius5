@@ -38,6 +38,8 @@ import type { SurgicalProcedure } from "./stores/procedureSlice";
 function App() {
   const theme = useThemeStore((s) => s.theme);
   const setProcedure = useSimulationStore((s) => s.setProcedure);
+  const setMode = useSimulationStore((s) => s.setMode);
+  const startProcedure = useSimulationStore((s) => s.startProcedure);
 
   const [showIntro, setShowIntro] = useState(() => !hasSeenOnboarding());
   const showHUD = useSimulationStore((s) => s.showHUD);
@@ -47,6 +49,13 @@ function App() {
 
   function handleIntroDismiss(selectedProcedure: SurgicalProcedure) {
     setProcedure(selectedProcedure);
+    // Drop the user straight into Mark Entry mode and (for the fully-guided
+    // Cataract procedure) auto-start the curriculum, so finishing onboarding
+    // is enough to begin — no need to hunt for "Start Procedure" in a panel.
+    setMode("PLACE");
+    if (selectedProcedure === "cataract") {
+      startProcedure();
+    }
     setShowIntro(false);
   }
 
@@ -96,18 +105,16 @@ function App() {
         {showHUD ? "✕ Close" : "☰ Help"}
       </button>
 
-      {/* Replay intro */}
-      {!showHUD && (
-        <button
-          onClick={() => {
-            setShowIntro(true);
-          }}
-          className="pointer-events-auto fixed right-4 top-14 z-50 rounded-lg border border-blue-500/20 bg-gray-950/70 px-3 py-1.5 text-[10px] text-blue-400/60 backdrop-blur hover:text-blue-300/80 transition-colors"
-          title="Replay intro / change procedure"
-        >
-          ? Intro
-        </button>
-      )}
+      {/* Replay intro — always reachable, whether or not the HUD panel is open */}
+      <button
+        onClick={() => {
+          setShowIntro(true);
+        }}
+        className="pointer-events-auto fixed right-4 top-14 z-50 rounded-lg border border-blue-500/20 bg-gray-950/70 px-3 py-1.5 text-[10px] text-blue-400/60 backdrop-blur hover:text-blue-300/80 transition-colors"
+        title="Replay intro / change procedure"
+      >
+        ? Intro
+      </button>
 
       {/* ── HUD panels — toggled by ☰ Help ── */}
       {showHUD && (

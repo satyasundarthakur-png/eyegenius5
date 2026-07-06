@@ -82,16 +82,15 @@ function KeyBindingRow({ bindingKey }: { bindingKey: keyof KeyBindings }) {
 }
 
 export function SettingsPanel({ onClose }: SettingsPanelProps) {
-  const [corneaOpacity, setCorneaOpacity] = useState(0.35);
-  const [lightIntensity, setLightIntensity] = useState(1.0);
-  const [showSafetyCone, setShowSafetyCone] = useState(true);
-  const [showNormalIndicator, setShowNormalIndicator] = useState(true);
   const [showKeybindings, setShowKeybindings] = useState(false);
 
-  const mode = useSimulationStore((s) => s.mode);
   const theme = useThemeStore((s) => s.theme);
   const setTheme = useThemeStore((s) => s.setTheme);
   const resetKeyBindings = useKeyBindingsStore((s) => s.resetKeyBindings);
+  const showSafetyCone = useSimulationStore((s) => s.showSafetyCone);
+  const setShowSafetyCone = useSimulationStore((s) => s.setShowSafetyCone);
+  const showNormalIndicator = useSimulationStore((s) => s.showNormalIndicator);
+  const setShowNormalIndicator = useSimulationStore((s) => s.setShowNormalIndicator);
 
   return (
     <div className="pointer-events-auto fixed inset-0 z-50 flex items-center justify-center bg-black/50">
@@ -141,46 +140,9 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
             </div>
           </div>
 
-          {/* Cornea Opacity */}
-          <div>
-            <label className="mb-1.5 block text-sm text-blue-100">
-              Cornea Opacity: {corneaOpacity.toFixed(2)}
-            </label>
-            <input
-              type="range"
-              min={0.1}
-              max={0.8}
-              step={0.05}
-              value={corneaOpacity}
-              onChange={(e) => {
-                setCorneaOpacity(parseFloat(e.target.value));
-              }}
-              className="w-full accent-blue-500 [&::-webkit-slider-thumb]:cursor-pointer"
-              disabled={mode !== "VIEW"}
-            />
-            <p className="mt-1 text-xs text-blue-300/60">
-              Adjust transparency of the cornea. Changes apply in VIEW mode.
-            </p>
-          </div>
-
-          {/* Light Intensity */}
-          <div>
-            <label className="mb-1.5 block text-sm text-blue-100">
-              Light Intensity: {lightIntensity.toFixed(1)}
-            </label>
-            <input
-              type="range"
-              min={0.5}
-              max={2.0}
-              step={0.1}
-              value={lightIntensity}
-              onChange={(e) => {
-                setLightIntensity(parseFloat(e.target.value));
-              }}
-              className="w-full accent-blue-500 [&::-webkit-slider-thumb]:cursor-pointer"
-            />
-            <p className="mt-1 text-xs text-blue-300/60">Adjust scene lighting intensity.</p>
-          </div>
+          {/* Note: coaxial light intensity is a real, functional control — it lives in
+              the Microscope panel (not here) since it's tied to the simulated
+              operating-microscope model rather than being a generic scene light. */}
 
           {/* Visibility Toggles */}
           <div className="space-y-2">
@@ -245,7 +207,8 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
           {/* Info */}
           <div className="rounded border border-blue-500/15 bg-blue-500/5 px-3 py-2">
             <p className="text-xs text-blue-300/70">
-              💡 Tip: Settings are saved to localStorage and persist across sessions.
+              💡 Tip: Theme and keyboard shortcuts are saved to your browser and persist across
+              sessions. Visualization toggles reset when you reload.
             </p>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { ChevronRight, ChevronLeft, X } from 'lucide-react';
 
-const STORAGE_KEY = 'openeyesim-onboarded-v3';
+export const STORAGE_KEY = 'openeyesim-onboarded-v3';
 
 // ─── Surgery data ────────────────────────────────────────────────────────────
 
@@ -44,16 +44,16 @@ const SURGERIES: SurgeryInfo[] = [
     steps: [
       {
         num: 'Setup',
-        title: 'Open the panels',
-        icon: '☰',
-        action: 'Press the ☰ Help button (top-right corner). In the Cataract Curriculum panel click "Start Procedure". The eye fixates once you mark an entry point.',
-        tip: 'All panels are hidden during surgery to keep the operative field clean.',
+        title: "You're ready to go",
+        icon: '📍',
+        action: "When you finish this walkthrough, you'll land in Mark Entry mode with the Cataract Curriculum already started — just click the eye surface near the limbus (3 o'clock position for a right eye) to place your entry point. A green marker locks the keratome entry, and the eye fixates automatically.",
+        tip: 'Open the ☰ Help button any time to see all panels, replay this intro, or switch procedures.',
       },
       {
         num: 'Place',
         title: 'Mark the entry point',
         icon: '📍',
-        action: 'Press P to enter PLACE mode, then click the eye surface near the limbus (3 o\'clock position for a right eye). A green marker locks the keratome entry.',
+        action: 'Click the eye surface near the limbus (3 o\'clock position for a right eye). A green marker locks the keratome entry. (If you ever need to re-enter Mark Entry mode later, press P.)',
         tip: 'The camera locks once the entry point is marked — you can no longer orbit the eye.',
       },
       {

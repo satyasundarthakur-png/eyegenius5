@@ -44,7 +44,10 @@ export const createNeedleSlice: StateCreator<SimulationState, [], [], NeedleSlic
     const clamped = Math.max(0, Math.min(insertionDepth, MAX_INSERTION_DEPTH));
     const { phase } = get();
     let newPhase = phase;
-    if (phase === "CONTACT") {
+    // Matches phaseMachine.ts's documented contract: CONTACT -> INSERTING only
+    // once the instrument actually has some depth (or tilt, handled in
+    // setTiltAngles) — depth 0 alone should not count as "moved".
+    if (phase === "CONTACT" && clamped > 0) {
       newPhase = transitionPhase(phase, "needleMoved");
     } else if (clamped <= 0 && phase === "INSERTING") {
       newPhase = transitionPhase(phase, "depthReturned");
@@ -65,7 +68,7 @@ export const createNeedleSlice: StateCreator<SimulationState, [], [], NeedleSlic
   },
 
   reset: () => {
-    const { resetMicroscope, clearReplay, setProcedure } = get();
+    const { resetMicroscope, clearReplay, setProcedure, resetPhysics } = get();
     set({
       mode: "VIEW",
       tiltAlpha: 0,
@@ -89,10 +92,12 @@ export const createNeedleSlice: StateCreator<SimulationState, [], [], NeedleSlic
       playbackSpeed: 1,
       playbackIndex: 0,
     });
-    // Reset the surgical-workflow engines (microscope, curriculum, scoring/coach, replay)
-    // so a fresh attempt doesn't inherit progress/score from the previous one.
+    // Reset the surgical-workflow engines (microscope, curriculum, scoring/coach, replay,
+    // physics/tissue-deformation) so a fresh attempt doesn't inherit progress, score, or
+    // capsule-tear state from the previous one.
     resetMicroscope();
     clearReplay();
+    resetPhysics();
     setProcedure("cataract");
   },
 });
