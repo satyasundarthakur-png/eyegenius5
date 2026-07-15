@@ -115,7 +115,7 @@ function createIrisTexture(): THREE.CanvasTexture {
     if (x === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
   }
-  ctx.strokeStyle = rgba(110, 150, 200, 0.28);
+  ctx.strokeStyle = rgba(180, 145, 85, 0.32);
   ctx.lineWidth = 5;
   ctx.stroke();
   // Brighter highlight just outside the jagged line (ciliary-zone side)
@@ -126,7 +126,7 @@ function createIrisTexture(): THREE.CanvasTexture {
     if (x === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
   }
-  ctx.strokeStyle = rgba(150, 185, 225, 0.18);
+  ctx.strokeStyle = rgba(210, 175, 110, 0.22);
   ctx.lineWidth = 8;
   ctx.stroke();
 
@@ -140,7 +140,7 @@ function createIrisTexture(): THREE.CanvasTexture {
       if (x === 0) ctx.moveTo(x, y + wobble);
       else ctx.lineTo(x, y + wobble);
     }
-    ctx.strokeStyle = rgba(20, 35, 65, 0.08 + rng() * 0.06);
+    ctx.strokeStyle = rgba(45, 25, 12, 0.1 + rng() * 0.07);
     ctx.lineWidth = 1;
     ctx.stroke();
   }
@@ -153,9 +153,9 @@ function createIrisTexture(): THREE.CanvasTexture {
     const cr = 1.5 + rng() * 6;
 
     const cryptGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
-    cryptGrad.addColorStop(0, rgba(12, 20, 42, 0.45));
-    cryptGrad.addColorStop(0.6, rgba(18, 30, 58, 0.2));
-    cryptGrad.addColorStop(1, rgba(28, 45, 85, 0));
+    cryptGrad.addColorStop(0, rgba(30, 18, 8, 0.5));
+    cryptGrad.addColorStop(0.6, rgba(50, 32, 15, 0.22));
+    cryptGrad.addColorStop(1, rgba(70, 45, 22, 0));
     ctx.fillStyle = cryptGrad;
     ctx.fillRect(cx - cr, cy - cr, cr * 2, cr * 2);
   }
@@ -165,7 +165,7 @@ function createIrisTexture(): THREE.CanvasTexture {
     const x = rng() * width;
     const y = height * 0.05 + rng() * height * 0.9;
     const len = 2 + rng() * 7;
-    ctx.strokeStyle = rgba(30 + rng() * 50, 60 + rng() * 50, 120 + rng() * 50, 0.06 + rng() * 0.1);
+    ctx.strokeStyle = rgba(80 + rng() * 60, 55 + rng() * 45, 25 + rng() * 40, 0.06 + rng() * 0.1);
     ctx.lineWidth = 0.4 + rng() * 0.5;
     ctx.beginPath();
     ctx.moveTo(x, y);
