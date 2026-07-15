@@ -40,32 +40,29 @@ function createIrisTexture(): THREE.CanvasTexture {
   const rgba = (r: number, g: number, b: number, a: number) =>
     "rgba(" + r.toFixed(0) + ", " + g.toFixed(0) + ", " + b.toFixed(0) + ", " + a.toFixed(3) + ")";
 
-  // ── Base color: warm hazel-blue, with sectoral heterochromia patches ──────
-  // Real irises are rarely a flat single hue — even predominantly blue eyes
-  // commonly show warm amber/brown sectoral flecks radiating from the
-  // collarette, especially near the pupil. v=0 (top) = pupil edge, v=1
-  // (bottom) = limbus edge.
+  // ── Base color: natural warm hazel-brown iris ─────────────────────────────
+  // Real human irises with a dilated pupil under surgical light most commonly
+  // read as a warm hazel/brown ring. Gradient goes from a dark umber near
+  // the pupil (v=0 top) to a lighter amber-tan at the limbus (v=1 bottom).
   for (let y = 0; y < height; y++) {
     const t = y / height;
-    const r = 34 + t * 70;
-    const g = 64 + t * 100;
-    const b = 118 + t * 92;
+    const r = 78 + t * 92;   // 78 → 170  warm brown → amber tan
+    const g = 52 + t * 78;   // 52 → 130
+    const b = 30 + t * 46;   // 30 → 76
     ctx.fillStyle = rgba(r, g, b, 1);
     ctx.fillRect(0, y, width, 1);
   }
 
-  // Sectoral amber/brown heterochromia flecks — 3–5 wedge-shaped warm patches
-  // radiating from near the pupil margin outward, common in real (even blue)
-  // irises and one of the biggest cues that breaks the "flat CG disc" look.
+  // Sectoral flecks — subtle green/gold heterochromia wedges common in hazel eyes
   const sectorCount = 3 + Math.floor(rng() * 3);
   for (let s = 0; s < sectorCount; s++) {
     const angleU = rng() * width;
     const sectorWidth = width * (0.05 + rng() * 0.08);
     const grad = ctx.createLinearGradient(0, 0, 0, height * 0.7);
-    grad.addColorStop(0, rgba(150, 100, 50, 0.0));
-    grad.addColorStop(0.25, rgba(160, 110, 55, 0.35 + rng() * 0.2));
-    grad.addColorStop(0.6, rgba(140, 95, 50, 0.12));
-    grad.addColorStop(1, rgba(140, 95, 50, 0));
+    grad.addColorStop(0, rgba(120, 130, 60, 0.0));
+    grad.addColorStop(0.25, rgba(150, 145, 70, 0.28 + rng() * 0.18));
+    grad.addColorStop(0.6, rgba(130, 120, 60, 0.1));
+    grad.addColorStop(1, rgba(130, 120, 60, 0));
     ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.ellipse(angleU, height * 0.18, sectorWidth, height * 0.5, 0, 0, Math.PI * 2);
