@@ -85,9 +85,9 @@ function createIrisTexture(): THREE.CanvasTexture {
     const startY = height * 0.05 + rng() * height * 0.08;
 
     const brightness = 0.6 + rng() * 0.7;
-    const fr = (45 + rng() * 55) * brightness;
-    const fg = (85 + rng() * 65) * brightness;
-    const fb = (145 + rng() * 65) * brightness;
+    const fr = (95 + rng() * 70) * brightness;   // warm brown fibers
+    const fg = (65 + rng() * 55) * brightness;
+    const fb = (35 + rng() * 40) * brightness;
     const fAlpha = 0.12 + rng() * 0.28;
 
     ctx.beginPath();
