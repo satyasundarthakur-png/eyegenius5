@@ -419,20 +419,16 @@ export function LimbusRing() {
   return (
     <mesh geometry={geometry}>
       <meshPhysicalMaterial
-        color={COLORS.limbus}
-        emissive={COLORS.limbus}
-        emissiveIntensity={0.08}
+        color="#6b5540"
+        emissive={new THREE.Color("#3a2a1c")}
+        emissiveIntensity={0.05}
         transparent
-        opacity={0.6}
-        roughness={0.25}
-        metalness={0.05}
-        clearcoat={0.5}
-        clearcoatRoughness={0.15}
-        transmission={0.2}
-        thickness={1.0}
-        attenuationColor={new THREE.Color("#c0d8ee")}
-        attenuationDistance={4.0}
-        envMapIntensity={0.8}
+        opacity={0.55}
+        roughness={0.45}
+        metalness={0.0}
+        clearcoat={0.35}
+        clearcoatRoughness={0.3}
+        envMapIntensity={0.5}
         depthWrite={false}
       />
     </mesh>
