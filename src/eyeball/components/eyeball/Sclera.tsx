@@ -215,18 +215,18 @@ export function Sclera() {
   return (
     <mesh geometry={geometry}>
       <meshPhysicalMaterial
-        color="#f0ebe2"
-        roughness={0.55}
+        color="#f8f5ee"
+        roughness={0.6}
         metalness={0.0}
-        clearcoat={0.15}
-        clearcoatRoughness={0.6}
-        transmission={0.04}
+        clearcoat={0.2}
+        clearcoatRoughness={0.5}
+        transmission={0.03}
         thickness={2.0}
-        attenuationColor={new THREE.Color("#fde8cc")}
-        attenuationDistance={6.0}
+        attenuationColor={new THREE.Color("#fff3d8")}
+        attenuationDistance={7.0}
         side={THREE.FrontSide}
         map={vesselMap}
-        envMapIntensity={0.4}
+        envMapIntensity={0.45}
       />
     </mesh>
   );
