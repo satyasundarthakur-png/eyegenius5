@@ -369,39 +369,30 @@ export function Iris() {
       <mesh ref={irisRingRef} geometry={irisRingGeometry} position={[0, 0, IRIS_Z]}>
         <meshPhysicalMaterial
           map={irisTexture}
-          emissive={COLORS.iris}
-          emissiveIntensity={0.02}
+          emissive={new THREE.Color("#3a220e")}
+          emissiveIntensity={0.015}
           side={THREE.DoubleSide}
-          roughness={0.4}
-          metalness={0.03}
-          transmission={0.1}
-          thickness={0.6}
-          attenuationColor={new THREE.Color("#3a70b0")}
-          attenuationDistance={2.0}
-          clearcoat={0.25}
-          clearcoatRoughness={0.25}
-          envMapIntensity={0.5}
+          roughness={0.55}
+          metalness={0.0}
+          clearcoat={0.15}
+          clearcoatRoughness={0.35}
+          envMapIntensity={0.4}
           depthTest={false}
           depthWrite={false}
         />
       </mesh>
 
-      {/* Pupil disc — dark, semi-transparent to show red-reflex fundal glow.
-          Sized to PUPIL_RADIUS, exactly matching the iris ring inner hole. */}
+      {/* Pupil disc — deep black opening; faint red-reflex only when coaxial light is strong */}
       <mesh ref={pupilMeshRef} geometry={pupilGeometry} position={[0, 0, IRIS_Z - 0.02]}>
         <meshPhysicalMaterial
           ref={pupilMatRef}
-          color="#04040e"
-          emissive={new THREE.Color("#bb1f00")}
+          color="#000000"
+          emissive={new THREE.Color("#4a0800")}
           emissiveIntensity={0}
           transparent
-          opacity={0.9}
-          roughness={0.8}
+          opacity={1.0}
+          roughness={0.95}
           metalness={0.0}
-          transmission={0.14}
-          thickness={1.2}
-          clearcoat={0.5}
-          clearcoatRoughness={0.15}
           side={THREE.DoubleSide}
           depthTest={false}
           depthWrite={false}
