@@ -40,32 +40,29 @@ function createIrisTexture(): THREE.CanvasTexture {
   const rgba = (r: number, g: number, b: number, a: number) =>
     "rgba(" + r.toFixed(0) + ", " + g.toFixed(0) + ", " + b.toFixed(0) + ", " + a.toFixed(3) + ")";
 
-  // ── Base color: warm hazel-blue, with sectoral heterochromia patches ──────
-  // Real irises are rarely a flat single hue — even predominantly blue eyes
-  // commonly show warm amber/brown sectoral flecks radiating from the
-  // collarette, especially near the pupil. v=0 (top) = pupil edge, v=1
-  // (bottom) = limbus edge.
+  // ── Base color: natural warm hazel-brown iris ─────────────────────────────
+  // Real human irises with a dilated pupil under surgical light most commonly
+  // read as a warm hazel/brown ring. Gradient goes from a dark umber near
+  // the pupil (v=0 top) to a lighter amber-tan at the limbus (v=1 bottom).
   for (let y = 0; y < height; y++) {
     const t = y / height;
-    const r = 34 + t * 70;
-    const g = 64 + t * 100;
-    const b = 118 + t * 92;
+    const r = 78 + t * 92;   // 78 → 170  warm brown → amber tan
+    const g = 52 + t * 78;   // 52 → 130
+    const b = 30 + t * 46;   // 30 → 76
     ctx.fillStyle = rgba(r, g, b, 1);
     ctx.fillRect(0, y, width, 1);
   }
 
-  // Sectoral amber/brown heterochromia flecks — 3–5 wedge-shaped warm patches
-  // radiating from near the pupil margin outward, common in real (even blue)
-  // irises and one of the biggest cues that breaks the "flat CG disc" look.
+  // Sectoral flecks — subtle green/gold heterochromia wedges common in hazel eyes
   const sectorCount = 3 + Math.floor(rng() * 3);
   for (let s = 0; s < sectorCount; s++) {
     const angleU = rng() * width;
     const sectorWidth = width * (0.05 + rng() * 0.08);
     const grad = ctx.createLinearGradient(0, 0, 0, height * 0.7);
-    grad.addColorStop(0, rgba(150, 100, 50, 0.0));
-    grad.addColorStop(0.25, rgba(160, 110, 55, 0.35 + rng() * 0.2));
-    grad.addColorStop(0.6, rgba(140, 95, 50, 0.12));
-    grad.addColorStop(1, rgba(140, 95, 50, 0));
+    grad.addColorStop(0, rgba(120, 130, 60, 0.0));
+    grad.addColorStop(0.25, rgba(150, 145, 70, 0.28 + rng() * 0.18));
+    grad.addColorStop(0.6, rgba(130, 120, 60, 0.1));
+    grad.addColorStop(1, rgba(130, 120, 60, 0));
     ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.ellipse(angleU, height * 0.18, sectorWidth, height * 0.5, 0, 0, Math.PI * 2);
@@ -88,9 +85,9 @@ function createIrisTexture(): THREE.CanvasTexture {
     const startY = height * 0.05 + rng() * height * 0.08;
 
     const brightness = 0.6 + rng() * 0.7;
-    const fr = (45 + rng() * 55) * brightness;
-    const fg = (85 + rng() * 65) * brightness;
-    const fb = (145 + rng() * 65) * brightness;
+    const fr = (95 + rng() * 70) * brightness;   // warm brown fibers
+    const fg = (65 + rng() * 55) * brightness;
+    const fb = (35 + rng() * 40) * brightness;
     const fAlpha = 0.12 + rng() * 0.28;
 
     ctx.beginPath();
@@ -118,7 +115,7 @@ function createIrisTexture(): THREE.CanvasTexture {
     if (x === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
   }
-  ctx.strokeStyle = rgba(110, 150, 200, 0.28);
+  ctx.strokeStyle = rgba(180, 145, 85, 0.32);
   ctx.lineWidth = 5;
   ctx.stroke();
   // Brighter highlight just outside the jagged line (ciliary-zone side)
@@ -129,7 +126,7 @@ function createIrisTexture(): THREE.CanvasTexture {
     if (x === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
   }
-  ctx.strokeStyle = rgba(150, 185, 225, 0.18);
+  ctx.strokeStyle = rgba(210, 175, 110, 0.22);
   ctx.lineWidth = 8;
   ctx.stroke();
 
@@ -143,7 +140,7 @@ function createIrisTexture(): THREE.CanvasTexture {
       if (x === 0) ctx.moveTo(x, y + wobble);
       else ctx.lineTo(x, y + wobble);
     }
-    ctx.strokeStyle = rgba(20, 35, 65, 0.08 + rng() * 0.06);
+    ctx.strokeStyle = rgba(45, 25, 12, 0.1 + rng() * 0.07);
     ctx.lineWidth = 1;
     ctx.stroke();
   }
@@ -156,9 +153,9 @@ function createIrisTexture(): THREE.CanvasTexture {
     const cr = 1.5 + rng() * 6;
 
     const cryptGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
-    cryptGrad.addColorStop(0, rgba(12, 20, 42, 0.45));
-    cryptGrad.addColorStop(0.6, rgba(18, 30, 58, 0.2));
-    cryptGrad.addColorStop(1, rgba(28, 45, 85, 0));
+    cryptGrad.addColorStop(0, rgba(30, 18, 8, 0.5));
+    cryptGrad.addColorStop(0.6, rgba(50, 32, 15, 0.22));
+    cryptGrad.addColorStop(1, rgba(70, 45, 22, 0));
     ctx.fillStyle = cryptGrad;
     ctx.fillRect(cx - cr, cy - cr, cr * 2, cr * 2);
   }
@@ -168,7 +165,7 @@ function createIrisTexture(): THREE.CanvasTexture {
     const x = rng() * width;
     const y = height * 0.05 + rng() * height * 0.9;
     const len = 2 + rng() * 7;
-    ctx.strokeStyle = rgba(30 + rng() * 50, 60 + rng() * 50, 120 + rng() * 50, 0.06 + rng() * 0.1);
+    ctx.strokeStyle = rgba(80 + rng() * 60, 55 + rng() * 45, 25 + rng() * 40, 0.06 + rng() * 0.1);
     ctx.lineWidth = 0.4 + rng() * 0.5;
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -372,39 +369,30 @@ export function Iris() {
       <mesh ref={irisRingRef} geometry={irisRingGeometry} position={[0, 0, IRIS_Z]}>
         <meshPhysicalMaterial
           map={irisTexture}
-          emissive={COLORS.iris}
-          emissiveIntensity={0.02}
+          emissive={new THREE.Color("#3a220e")}
+          emissiveIntensity={0.015}
           side={THREE.DoubleSide}
-          roughness={0.4}
-          metalness={0.03}
-          transmission={0.1}
-          thickness={0.6}
-          attenuationColor={new THREE.Color("#3a70b0")}
-          attenuationDistance={2.0}
-          clearcoat={0.25}
-          clearcoatRoughness={0.25}
-          envMapIntensity={0.5}
+          roughness={0.55}
+          metalness={0.0}
+          clearcoat={0.15}
+          clearcoatRoughness={0.35}
+          envMapIntensity={0.4}
           depthTest={false}
           depthWrite={false}
         />
       </mesh>
 
-      {/* Pupil disc — dark, semi-transparent to show red-reflex fundal glow.
-          Sized to PUPIL_RADIUS, exactly matching the iris ring inner hole. */}
+      {/* Pupil disc — deep black opening; faint red-reflex only when coaxial light is strong */}
       <mesh ref={pupilMeshRef} geometry={pupilGeometry} position={[0, 0, IRIS_Z - 0.02]}>
         <meshPhysicalMaterial
           ref={pupilMatRef}
-          color="#04040e"
-          emissive={new THREE.Color("#bb1f00")}
+          color="#000000"
+          emissive={new THREE.Color("#4a0800")}
           emissiveIntensity={0}
           transparent
-          opacity={0.9}
-          roughness={0.8}
+          opacity={1.0}
+          roughness={0.95}
           metalness={0.0}
-          transmission={0.14}
-          thickness={1.2}
-          clearcoat={0.5}
-          clearcoatRoughness={0.15}
           side={THREE.DoubleSide}
           depthTest={false}
           depthWrite={false}
@@ -431,20 +419,16 @@ export function LimbusRing() {
   return (
     <mesh geometry={geometry}>
       <meshPhysicalMaterial
-        color={COLORS.limbus}
-        emissive={COLORS.limbus}
-        emissiveIntensity={0.08}
+        color="#6b5540"
+        emissive={new THREE.Color("#3a2a1c")}
+        emissiveIntensity={0.05}
         transparent
-        opacity={0.6}
-        roughness={0.25}
-        metalness={0.05}
-        clearcoat={0.5}
-        clearcoatRoughness={0.15}
-        transmission={0.2}
-        thickness={1.0}
-        attenuationColor={new THREE.Color("#c0d8ee")}
-        attenuationDistance={4.0}
-        envMapIntensity={0.8}
+        opacity={0.55}
+        roughness={0.45}
+        metalness={0.0}
+        clearcoat={0.35}
+        clearcoatRoughness={0.3}
+        envMapIntensity={0.5}
         depthWrite={false}
       />
     </mesh>

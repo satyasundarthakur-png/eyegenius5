@@ -49,12 +49,12 @@ function createVesselTexture(): THREE.CanvasTexture {
   const rgba = (r: number, g: number, b: number, a: number) =>
     "rgba(" + r.toFixed(0) + ", " + g.toFixed(0) + ", " + b.toFixed(0) + ", " + a.toFixed(3) + ")";
 
-  // Base: warm white sclera with subtle color variation
+  // Base: bright natural sclera white with faint warm undertones toward posterior
   const gradient = ctx.createLinearGradient(0, 0, 0, size);
-  gradient.addColorStop(0, "#f8f4f0");
-  gradient.addColorStop(0.3, "#f5f0ec");
-  gradient.addColorStop(0.7, "#f2ede8");
-  gradient.addColorStop(1, "#efe8e2");
+  gradient.addColorStop(0, "#fbfaf6");
+  gradient.addColorStop(0.3, "#f7f5ef");
+  gradient.addColorStop(0.7, "#f2eee5");
+  gradient.addColorStop(1, "#ebe4d6");
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, size, size);
 
@@ -215,18 +215,18 @@ export function Sclera() {
   return (
     <mesh geometry={geometry}>
       <meshPhysicalMaterial
-        color="#f0ebe2"
-        roughness={0.55}
+        color="#f8f5ee"
+        roughness={0.6}
         metalness={0.0}
-        clearcoat={0.15}
-        clearcoatRoughness={0.6}
-        transmission={0.04}
+        clearcoat={0.2}
+        clearcoatRoughness={0.5}
+        transmission={0.03}
         thickness={2.0}
-        attenuationColor={new THREE.Color("#fde8cc")}
-        attenuationDistance={6.0}
+        attenuationColor={new THREE.Color("#fff3d8")}
+        attenuationDistance={7.0}
         side={THREE.FrontSide}
         map={vesselMap}
-        envMapIntensity={0.4}
+        envMapIntensity={0.45}
       />
     </mesh>
   );
